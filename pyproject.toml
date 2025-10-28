@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MiniNumPy"
+version = "0.1.0"
+description = "A minimalist reimplementation of NumPy and linear algebra from scratch."
+authors = [{ name = "Your Name", email = "you@example.com" }]
+license = "MIT"
+requires-python = ">=3.8"
+dependencies = []
