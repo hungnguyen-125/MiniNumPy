@@ -7,28 +7,18 @@ sys.path.append(str(Path(__file__).resolve().parent / "src"))
 from MiniNumPy import MiniNumPy as mnp
 import numpy as np
 
-# a = mnp.Array([[[1, 2, 3], [4, 5, 6], [7, 8, 9]],[[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
-# print("Array data:", a.data)
-# print("Array shape:", a.shape)
-# print("Array ndim:", a.ndim)
-# print("Array size:", a.size)
+# 2D array
+a = mnp.array([[1, 2, 3], 
+               [4, 5, 6]])
+print(a.transpose())  # shape (3,2)
+print('-------')
 
-
-# b = np.array([[[1, 2, 3], [4, 5, 6], [7, 8, 9]],[[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
-# print(a)
-# print(b)
-
-a = mnp.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
-# print(a.shape)
-# print(a.transpose())
-# b = mnp.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
-# print(b.reshape((4,2)))
-# print(b.reshape((4,2)))
-# print(b)
-
-c = mnp.array([[[[1], [2]], [[3], [4]]], [[[5], [6]], [[7], [8]]]])
-print(c) 
-print('-----')
-d = np.array([[[[1], [2]], [[3], [4]]], [[[5], [6]], [[7], [8]]]])
-print(d)
-
+# 3D array
+b = mnp.array([[[1, 2], [3, 4]], 
+               [[5, 6], [7, 8]]])
+print(b.transpose())  # shape (2,2,2)
+print('-------')
+# 4D array
+c = mnp.array([[[[1], [2]], [[3], [4]]], 
+               [[[5], [6]], [[7], [8]]]])
+print(c.transpose())  # shape (1,2,2,2)

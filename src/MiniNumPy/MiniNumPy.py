@@ -71,15 +71,57 @@ class Array:
     
     #TODO: add transpose method for nD arrays
     def transpose(self):
-        if not isinstance(self, list) or len(self) == 0:
+        """
+        Transpose an n-dimensional array by reversing the order of axes.
+        Returns a new Array with axes transposed.
+        """
+        if not isinstance(self.data, list):
             return self
-        transposed = []
-        for i in range(len(self[0])):
-            new_row = []
-            for row in self:
-                new_row.append(row[i])
-            transposed.append(new_row)
-        return Array(transposed)
+
+        # Helper function to get item at specific indices
+        def get_item(data, indices):
+            current = data
+            for idx in indices:
+                current = current[idx]
+            return current
+
+        # Helper function to create transposed data structure
+        def build_transposed(shape):
+            if not shape:
+                return None
+            return [build_transposed(shape[1:]) for _ in range(shape[0])]
+
+        # Get all possible indices for the transposed array
+        def get_indices(shape):
+            if not shape:
+                return [[]]
+            result = []
+            for i in range(shape[0]):
+                for sub_indices in get_indices(shape[1:]):
+                    result.append([i] + sub_indices)
+            return result
+
+        # Create new shape by reversing axes
+        new_shape = self.shape[::-1]
+        
+        # Create empty nested structure for transposed data
+        transposed_data = build_transposed(new_shape)
+        
+        # Fill the transposed data
+        for indices in get_indices(self.shape):
+            # Reverse the indices for the transposed array
+            transposed_indices = indices[::-1]
+            
+            # Get the value from original array
+            value = get_item(self.data, indices)
+            
+            # Set the value in the transposed array
+            current = transposed_data
+            for idx in transposed_indices[:-1]:
+                current = current[idx]
+            current[transposed_indices[-1]] = value
+
+        return Array(transposed_data)
     
     def flatten(self):
         # flatten the nested Python list in self.data and return a flat list of values
