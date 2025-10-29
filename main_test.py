@@ -18,8 +18,17 @@ import numpy as np
 # print(a)
 # print(b)
 
-a = mnp.array([[1, 2, 3], [4, 5, 6]])
-print(a)
-b = mnp.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
-print(b.reshape((4,2)))
-print(b)
+a = mnp.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+# print(a.shape)
+# print(a.transpose())
+# b = mnp.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+# print(b.reshape((4,2)))
+# print(b.reshape((4,2)))
+# print(b)
+
+c = mnp.array([[[[1], [2]], [[3], [4]]], [[[5], [6]], [[7], [8]]]])
+print(c) 
+print('-----')
+d = np.array([[[[1], [2]], [[3], [4]]], [[[5], [6]], [[7], [8]]]])
+print(d)
+

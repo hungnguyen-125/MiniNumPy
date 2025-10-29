@@ -25,6 +25,7 @@ class Array:
             size *= dim
         return size
     
+    #TODO: seprate build_nested_list from reshape method
     def reshape(self, new_shape):
         # check if the new shape is compatible with the current size
         new_size = self._get_size(new_shape)
@@ -50,9 +51,35 @@ class Array:
         new_data, _ = _build_nested_list(flat_data, new_shape)
         return Array(new_data)
     
-    # TODO: add str method for pretty printing
+    # TODO: understand this function
     def __str__(self):
-        return str(self.data)
+        def format_array(arr, shape, level=0):
+            if len(shape) == 1:
+                return '[' + ' '.join(map(str, arr)) + ']' 
+            else:
+                step = int(len(arr) / shape[0])
+                rows = []
+                for i in range(shape[0]):
+                    part = arr[i*step:(i+1)*step]
+                    rows.append(format_array(part, shape[1:], level+1))
+                newlines = '\n' * (len(shape) - 1)
+                indent = ' ' * (level + 1)
+                newline = newlines + indent
+                return '[' + newline.join(rows) + ']'
+        
+        return format_array(self.flatten(), self.shape)
+    
+    #TODO: add transpose method for nD arrays
+    def transpose(self):
+        if not isinstance(self, list) or len(self) == 0:
+            return self
+        transposed = []
+        for i in range(len(self[0])):
+            new_row = []
+            for row in self:
+                new_row.append(row[i])
+            transposed.append(new_row)
+        return Array(transposed)
     
     def flatten(self):
         # flatten the nested Python list in self.data and return a flat list of values
