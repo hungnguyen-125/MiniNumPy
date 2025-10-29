@@ -69,3 +69,42 @@ class Array:
 def array(data):
     return Array(data)
 
+def _build(shape, fill_value):
+    if len(shape) == 0:
+        return fill_value
+    else:
+        return [_build(shape[1:], fill_value) for _ in range(shape[0])]
+    
+def zeros(shape):
+    data = _build(shape, 0)
+    return Array(data)
+
+def ones(shape):
+    data = _build(shape, 1)
+    return Array(data)
+
+def eye(n):
+    data = _build((n, n), 0)
+    for i in range(n):
+        data[i][i] = 1
+    return Array(data)
+
+def arange(start, stop=None, step=1):
+    if stop is None:
+        stop = start
+        start = 0
+    data = []
+    value = start
+    while (step > 0 and value < stop) or (step < 0 and value > stop):
+        data.append(value)
+        value += step
+    return Array(data)
+
+def linspace(start, stop, num=50):
+    if num <= 0:
+        return Array([])
+    if num == 1:
+        return Array([start])
+    step = (stop - start) / (num - 1)
+    data = [start + i * step for i in range(num)]
+    return Array(data)
