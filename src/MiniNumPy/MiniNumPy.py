@@ -24,3 +24,16 @@ class Array:
         for dim in shape:
             size *= dim
         return size
+    
+    def flatten(self):
+        # flatten the nested Python list in self.data and return a flat list of values
+        def _flatten(data):
+            if not isinstance(data, list):
+                return [data]
+            res = []
+            for item in data:
+                res.extend(_flatten(item))
+            return res
+
+        return _flatten(self.data)
+    
