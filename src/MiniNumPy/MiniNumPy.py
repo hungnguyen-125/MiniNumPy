@@ -1,5 +1,5 @@
+from __future__ import annotations
 import math
-
 class Array:
     def __init__(self,data):
         self.data = data
@@ -25,6 +25,34 @@ class Array:
             size *= dim
         return size
     
+    def flatten (self):
+        flattened_array = []
+        def _flat(arr):
+            for x in arr:
+                if not isinstance(x,list):
+                    flattened_array.append(x)
+                else:
+                    _flat(x)
+        _flat(self.data)
+        return Array(flattened_array)
+    
+    # def build(self, shape:tuple):
+    #     flat = self.flatten()
+    #     relsult = []
+        
+    #     size = 1
+    #     for x in shape:
+    #         size*= x
+            
+    #     if size != len(flat):
+    #         raise ValueError("Matrix dimension violation")
+    #     for i in range(len(shape),0,-1):
+    #         for j in range(len(shape)/shape[i]):
+    #             relsult.append(flat[shape[i]*j:shape[i]*(j+1)-1])
+    #         flat = relsult
+            
+    #     return flat
+            
     #TODO: seprate build_nested_list from reshape method
     def reshape(self, new_shape):
         # check if the new shape is compatible with the current size
@@ -35,40 +63,27 @@ class Array:
         # flatten the data
         flat_data = self.flatten()
         
-        # build the new nested list structure
-        def _build_nested_list(flat_data, shape):
-            if len(shape) == 0:
-                return flat_data[0], flat_data[1:]
-            else:
-                dim = shape[0]
-                sub_shape = shape[1:]
-                nested_list = []
-                for _ in range(dim):
-                    sub_list, flat_data = _build_nested_list(flat_data, sub_shape)
-                    nested_list.append(sub_list)
-                return nested_list, flat_data
-        
         new_data, _ = _build_nested_list(flat_data, new_shape)
         return Array(new_data)
     
     # TODO: understand this function
     def __str__(self):
-        def format_array(arr, shape, level=0):
-            if len(shape) == 1:
-                return '[' + ' '.join(map(str, arr)) + ']' 
-            else:
-                step = int(len(arr) / shape[0])
-                rows = []
-                for i in range(shape[0]):
-                    part = arr[i*step:(i+1)*step]
-                    rows.append(format_array(part, shape[1:], level+1))
-                newlines = '\n' * (len(shape) - 1)
-                indent = ' ' * (level + 1)
-                newline = newlines + indent
-                return '[' + newline.join(rows) + ']'
+        # def format_array(arr, shape, level=0):
+        #     if len(shape) == 1:
+        #         return '[' + ' '.join(map(str, arr)) + ']' 
+        #     else:
+        #         step = int(len(arr) / shape[0])
+        #         rows = []
+        #         for i in range(shape[0]):
+        #             part = arr[i*step:(i+1)*step]
+        #             rows.append(format_array(part, shape[1:], level+1))
+        #         newlines = '\n' * (len(shape) - 1)
+        #         indent = ' ' * (level + 1)
+        #         newline = newlines + indent
+        #         return '[' + newline.join(rows) + ']'
         
-        return format_array(self.flatten(), self.shape)
-    
+        # return format_array(self.flatten(), self.shape)
+        return str(self.data)
     #TODO: add transpose method for nD arrays
     def transpose(self):
         """
@@ -122,18 +137,19 @@ class Array:
             current[transposed_indices[-1]] = value
 
         return Array(transposed_data)
-    
-    def flatten(self):
-        # flatten the nested Python list in self.data and return a flat list of values
-        def _flatten(data):
-            if not isinstance(data, list):
-                return [data]
-            res = []
-            for item in data:
-                res.extend(_flatten(item))
-            return res
 
-        return _flatten(self.data)
+# build the new nested list structure
+def _build_nested_list(flat_data, shape):
+    if len(shape) == 0:
+        return flat_data[0], flat_data[1:]
+    else:
+        dim = shape[0]
+        sub_shape = shape[1:]
+        nested_list = []
+        for _ in range(dim):
+            sub_list, flat_data = _build_nested_list(flat_data, sub_shape)
+            nested_list.append(sub_list)
+        return nested_list, flat_data
     
 def array(data):
     return Array(data)
