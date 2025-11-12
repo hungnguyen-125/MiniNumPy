@@ -34,7 +34,7 @@ class Array:
                 else:
                     _flat(x)
         _flat(self.data)
-        return Array(flattened_array)
+        return flattened_array
     
     # def build(self, shape:tuple):
     #     flat = self.flatten()
@@ -68,22 +68,22 @@ class Array:
     
     # TODO: understand this function
     def __str__(self):
-        # def format_array(arr, shape, level=0):
-        #     if len(shape) == 1:
-        #         return '[' + ' '.join(map(str, arr)) + ']' 
-        #     else:
-        #         step = int(len(arr) / shape[0])
-        #         rows = []
-        #         for i in range(shape[0]):
-        #             part = arr[i*step:(i+1)*step]
-        #             rows.append(format_array(part, shape[1:], level+1))
-        #         newlines = '\n' * (len(shape) - 1)
-        #         indent = ' ' * (level + 1)
-        #         newline = newlines + indent
-        #         return '[' + newline.join(rows) + ']'
+        def format_array(arr, shape, level=0):
+            if len(shape) == 1:
+                return '[' + ' '.join(map(str, arr)) + ']' 
+            else:
+                step = int(len(arr) / shape[0])
+                rows = []
+                for i in range(shape[0]):
+                    part = arr[i*step:(i+1)*step]
+                    rows.append(format_array(part, shape[1:], level+1))
+                newlines = '\n' * (len(shape) - 1)
+                indent = ' ' * (level + 1)
+                newline = newlines + indent
+                return '[' + newline.join(rows) + ']'
         
-        # return format_array(self.flatten(), self.shape)
-        return str(self.data)
+        return format_array(self.flatten(), self.shape)
+    
     #TODO: add transpose method for nD arrays
     def transpose(self):
         """
@@ -137,7 +137,93 @@ class Array:
             current[transposed_indices[-1]] = value
 
         return Array(transposed_data)
-
+    ################################################Elementwise Operations#####################################################
+    def __add__(self:Array, other:Array)-> Array:
+        self_flat = self.flatten()
+        other_flat = other.flatten()
+        
+        if len(self_flat) != len(other_flat):
+            raise ValueError("Arrays must have the same size for addition")
+        
+        result_flat = [a + b for a, b in zip(self_flat, other_flat)]
+        result_data, _ = _build_nested_list(result_flat, self.shape)
+        return Array(result_data)
+    
+    def __mul__(self:Array, other:float)-> Array:
+        self_flat = self.flatten()
+        
+        result_flat = [a * other for a in self_flat]
+        result_data, _ = _build_nested_list(result_flat, self.shape)
+        return Array(result_data)
+    
+    def __sub__(self:Array, other:Array)-> Array:
+        return self + (other * -1)
+    
+    def __matmul__(self:Array, other:Array)-> Array:
+        if self.ndim != 2 or other.ndim != 2:
+            raise ValueError("Both arrays must be 2-dimensional for matrix multiplication")
+        if self.shape[1] != other.shape[0]:
+            raise ValueError("Inner dimensions must match for matrix multiplication")
+        
+        result_data = []
+        for i in range(self.shape[0]):
+            row = []
+            for j in range(other.shape[1]):
+                sum_product = 0
+                for k in range(self.shape[1]):
+                    sum_product += self.data[i][k] * other.data[k][j]
+                row.append(sum_product)
+            result_data.append(row)
+        
+        return Array(result_data)
+    
+    def __truediv__(self:Array, other:float)-> Array:
+        self_flat = self.flatten()
+        
+        result_flat = [a / other for a in self_flat]
+        result_data, _ = _build_nested_list(result_flat, self.shape)
+        return Array(result_data)
+    
+    def __pow__(self:Array, other:float):
+        self_flat = self.flatten()
+        
+        result_flat = [a ** other for a in self_flat]
+        result_data, _ = _build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def inv(self):
+        if self.ndim != 2 or self.shape[0] != self.shape[1]:
+            raise ValueError("Only square 2D arrays can be inverted")
+        
+        n = self.shape[0]
+        # Create an identity matrix of the same size
+        identity = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+        
+        # Create a copy of the original matrix
+        A = [row[:] for row in self.data]
+        
+        for i in range(n):
+            # Find the pivot
+            pivot = A[i][i]
+            if pivot == 0:
+                raise ValueError("Matrix is singular and cannot be inverted")
+            
+            # Normalize the pivot row
+            for j in range(n):
+                A[i][j] /= pivot
+                identity[i][j] /= pivot
+            
+            # Eliminate other rows
+            for k in range(n):
+                if k != i:
+                    factor = A[k][i]
+                    for j in range(n):
+                        A[k][j] -= factor * A[i][j]
+                        identity[k][j] -= factor * identity[i][j]
+        
+        return Array(identity)
+        
+    
 # build the new nested list structure
 def _build_nested_list(flat_data, shape):
     if len(shape) == 0:
