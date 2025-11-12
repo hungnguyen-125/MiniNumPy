@@ -191,6 +191,34 @@ class Array:
         result_data, _ = _build_nested_list(result_flat,self.shape)
         return Array(result_data)
     
+    def exp(self):
+        self_flat = self.flatten()
+        
+        result_flat = [math.exp(a) for a in self_flat]
+        result_data, _ = _build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def log(self):
+        self_flat = self.flatten()
+        
+        result_flat = [math.log(a) for a in self_flat]
+        result_data, _ = _build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def abs(self):
+        self_flat = self.flatten()
+        
+        result_flat = [math.abs(a) for a in self_flat]
+        result_data, _ = _build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def sqrt(self):
+        self_flat = self.flatten()
+        
+        result_flat = [math.sqrt(a) for a in self_flat]
+        result_data, _ = _build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+        
     def inv(self):
         if self.ndim != 2 or self.shape[0] != self.shape[1]:
             raise ValueError("Only square 2D arrays can be inverted")
