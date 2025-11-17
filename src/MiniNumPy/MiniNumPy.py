@@ -9,7 +9,11 @@ class Array:
         self.ndim = len(self.shape)
         
         self.size = self._get_size(self.shape)
-    
+
+        self._LU = None
+        
+        self._det = None
+        
     def _get_shape(self, data):
         if isinstance(data, list):
             if len(data) == 0:
@@ -83,6 +87,7 @@ class Array:
                 return '[' + newline.join(rows) + ']'
         
         return format_array(self.flatten(), self.shape)
+    
     def copy(self):
         # deep copy the underlying data
         new_data = [row[:] for row in self.data]
@@ -223,38 +228,39 @@ class Array:
         result_flat = [math.sqrt(a) for a in self_flat]
         result_data, _ = _build_nested_list(result_flat,self.shape)
         return Array(result_data)
-        
+    
+    #TODO: Practice more on using pivot
     def inv(self):
         if self.ndim != 2 or self.shape[0] != self.shape[1]:
             raise ValueError("Only square 2D arrays can be inverted")
         
         n = self.shape[0]
         # Create an identity matrix of the same size
-        identity = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
-        
+        I = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
         # Create a copy of the original matrix
-        A = [row[:] for row in self.data]
+        A = self.copy()
         
-        for i in range(n):
-            # Find the pivot
-            pivot = A[i][i]
+        for p in range (n):
+            pivot = A.data[p][p]
             if pivot == 0:
-                raise ValueError("Matrix is singular and cannot be inverted")
+                raise ValueError('Matrix is singular and cant be inverted')
             
-            # Normalize the pivot row
             for j in range(n):
-                A[i][j] /= pivot
-                identity[i][j] /= pivot
+                A.data[p][j] /= pivot
+                I[p][j] /= pivot
             
-            # Eliminate other rows
-            for k in range(n):
-                if k != i:
-                    factor = A[k][i]
+            for i in range(n):
+                if i != p:
+                    factor = A.data[i][p]
                     for j in range(n):
-                        A[k][j] -= factor * A[i][j]
-                        identity[k][j] -= factor * identity[i][j]
+                        A.data[i][j] -= factor *A.data[p][j]
+                        I[i][j] -= factor *I[p][j]
+                        I[i][j] = round(I[i][j], 8)
+                        
+        for j in range(n):
+            I[n-1][j] = round(I[n-1][j], 8)
         
-        return Array(identity)
+        return Array(I)
     
     def sum(self):
         self_flat = self.flatten()
@@ -298,28 +304,68 @@ class Array:
                 return i
     
     def LU_Decomposition(self):
+        if self._LU is not None:
+            return self._LU
+        
         n = self.shape[0]
         if n != self.shape[1]:
             raise ValueError("LU decomposition requires a square matrix")
 
-        L = eye(n)
+        L = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
         U = self.copy()
 
         for p in range (n-1):
             pivot = U.data[p][p]
             if pivot == 0:
-                 raise ValueError("Zero pivot encountered — pivoting required")
+                raise ValueError("Zero pivot encountered — pivoting required")
 
             for i in range(p+1, n):
                 w = U.data[i][p]/pivot
-                L.data[i][p] = w
+                L[i][p] = w
                 
                 for j in range (p, n):
                     U.data[i][j] -= w*U.data[p][j]
+        self._LU = (L, U)
+        return Array(L), U
+    
+    def determinant(self):
+        if self._det is not None:
+            return self._det
         
-        return L, U
+        L, U = self.LU_Decomposition()
+        det = 1
+        for i in range(self.shape[0]):
+            det*= U.data[i][i]
+        
+        self._det = det
+        return det    
     
-    
+    def solve(self: Array, other: Array ):
+        if self.ndim != 2 or self.shape[0] != self.shape[1]:
+            raise ValueError('Solve function just can be applied on 2-D square matrix')
+        if self.shape[1] != other.shape[0] or other.ndim != 1:
+            raise ValueError('Target vector is invalid')
+        
+        n = self.shape[0]
+        
+        L, U = self.LU_Decomposition()
+        x_tide = [0]*n
+        for i in range(n):
+            s = 0
+            for j in range(i):
+                s += L.data[i][j]*x_tide[j]
+            x_tide[i] = other.data[i] - s
+        
+        x = [0] * n
+        for i in range(n-1, -1, -1):
+            s = 0
+            for j in range(i+1, n):
+                s += U.data[i][j]*x[j]
+            x[i] = (x_tide[i] - s)/U.data[i][i]
+        
+        return Array(x)
+        
+        
 # build the new nested list structure
 def _build_nested_list(flat_data, shape):
     if len(shape) == 0:

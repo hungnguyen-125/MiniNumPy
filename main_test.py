@@ -13,24 +13,29 @@ a = mnp.array([[[[1, 2, 3],
 print(a/2)  # shape (3,2)
 print('-------')
 
-# 3D array
-b = mnp.array([[[1, 2], [3, 4]], 
-               [[5, 6], [7, 8]]])
-print(b)  # shape (2,2,2)
-print('-------')
-
 # 4D array
 c = mnp.array([[[[1], [2]], [[3], [4]]], 
                [[[5], [6]], [[7], [8]]]])
 print(c)  # shape (2,2,2,1)
 
 print('-------')
-d = np.array([[[[1], [2]], [[3], [4]]], 
-               [[[5], [6]], [[7], [8]]]])
+d = np.array([[2, 7, 1], 
+               [3, -2, 0],
+               [1, 5, 3]])
+print(np.linalg.inv(d))
 
 e = mnp.array([[2, 7, 1], 
                [3, -2, 0],
                [1, 5, 3]])
-L, U = e.LU_Decomposition()
-print(L)
-print(U)
+
+
+A = np.array([[2,7,1],
+              [3,-2,0],
+              [1,5,3]])
+
+b = np.array([1,2,3])
+
+print(np.linalg.solve(A, b))
+print('-------')
+f = mnp.array([1, 2, 3])
+print(e.solve(f))
