@@ -137,6 +137,7 @@ class Array:
             current[transposed_indices[-1]] = value
 
         return Array(transposed_data)
+    
     ################################################Elementwise Operations#####################################################
     def __add__(self:Array, other:Array)-> Array:
         self_flat = self.flatten()
@@ -250,7 +251,22 @@ class Array:
                         identity[k][j] -= factor * identity[i][j]
         
         return Array(identity)
-        
+    
+    def sum(self):
+        self_flat = self.flatten()
+        return sum(self_flat)
+    
+    def mean(self):
+        self_flat = self.flatten()
+        return sum(self_flat) / len(self_flat)
+    
+    def max(self):
+        self_flat = self.flatten()
+        return max(self_flat)
+    
+    def min(self):
+        self_flat = self.flatten()
+        return min(self_flat)
     
 # build the new nested list structure
 def _build_nested_list(flat_data, shape):
@@ -307,3 +323,4 @@ def linspace(start, stop, num=50):
     step = (stop - start) / (num - 1)
     data = [start + i * step for i in range(num)]
     return Array(data)
+
