@@ -254,7 +254,10 @@ class Array:
     
     def sum(self):
         self_flat = self.flatten()
-        return sum(self_flat)
+        sum = 0
+        for i in range(len(self_flat)):
+            sum += self_flat[i]
+        return sum
     
     def mean(self):
         self_flat = self.flatten()
@@ -262,11 +265,33 @@ class Array:
     
     def max(self):
         self_flat = self.flatten()
-        return max(self_flat)
+        max = self_flat[0] 
+        for i in range(1, len(self_flat)):
+            if self_flat[i] > max:
+                max = self_flat[i]
+        return max
     
     def min(self):
         self_flat = self.flatten()
-        return min(self_flat)
+        min = self_flat[0] 
+        for i in range(1, len(self_flat)):
+            if self_flat[i] < min:
+                min = self_flat[i]
+        return min
+
+    def arg_min(self):
+        self_flat = self.flatten()
+        a = min(self_flat)
+        for i in range(len(self_flat)):
+            if self_flat[i] == a:
+                return i
+    
+    def arg_max(self):
+        self_flat = self.flatten()
+        a = max(self_flat)
+        for i in range(len(self_flat)):
+            if self_flat[i] == a:
+                return i
     
 # build the new nested list structure
 def _build_nested_list(flat_data, shape):
