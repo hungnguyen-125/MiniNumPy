@@ -28,5 +28,9 @@ print('-------')
 d = np.array([[[[1], [2]], [[3], [4]]], 
                [[[5], [6]], [[7], [8]]]])
 
-e = d **3
-print(b.arg_max())
+e = mnp.array([[2, 7, 1], 
+               [3, -2, 0],
+               [1, 5, 3]])
+L, U = e.LU_Decomposition()
+print(L)
+print(U)

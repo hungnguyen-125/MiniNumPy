@@ -83,7 +83,11 @@ class Array:
                 return '[' + newline.join(rows) + ']'
         
         return format_array(self.flatten(), self.shape)
-    
+    def copy(self):
+        # deep copy the underlying data
+        new_data = [row[:] for row in self.data]
+        return Array(new_data)
+
     #TODO: add transpose method for nD arrays
     def transpose(self):
         """
@@ -292,6 +296,29 @@ class Array:
         for i in range(len(self_flat)):
             if self_flat[i] == a:
                 return i
+    
+    def LU_Decomposition(self):
+        n = self.shape[0]
+        if n != self.shape[1]:
+            raise ValueError("LU decomposition requires a square matrix")
+
+        L = eye(n)
+        U = self.copy()
+
+        for p in range (n-1):
+            pivot = U.data[p][p]
+            if pivot == 0:
+                 raise ValueError("Zero pivot encountered — pivoting required")
+
+            for i in range(p+1, n):
+                w = U.data[i][p]/pivot
+                L.data[i][p] = w
+                
+                for j in range (p, n):
+                    U.data[i][j] -= w*U.data[p][j]
+        
+        return L, U
+    
     
 # build the new nested list structure
 def _build_nested_list(flat_data, shape):
