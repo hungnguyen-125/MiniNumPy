@@ -4,7 +4,7 @@ from pathlib import Path
 # Add the src folder to the Python import path
 sys.path.append(str(Path(__file__).resolve().parent / "src"))
 
-from MiniNumPy import MiniNumPy as mnp
+import MiniNumPy as mnp
 import numpy as np
 
 # 2D array
@@ -35,7 +35,8 @@ A = np.array([[2,7,1],
 
 b = np.array([1,2,3])
 
-print(np.linalg.solve(A, b))
+print(np.linalg.inv(A))
 print('-------')
 f = mnp.array([1, 2, 3])
-print(e.solve(f))
+print(mnp.linalg.inv(e))
+print(mnp.ones((3,2)))

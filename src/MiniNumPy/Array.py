@@ -229,39 +229,6 @@ class Array:
         result_data, _ = _build_nested_list(result_flat,self.shape)
         return Array(result_data)
     
-    #TODO: Practice more on using pivot
-    def inv(self):
-        if self.ndim != 2 or self.shape[0] != self.shape[1]:
-            raise ValueError("Only square 2D arrays can be inverted")
-        
-        n = self.shape[0]
-        # Create an identity matrix of the same size
-        I = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
-        # Create a copy of the original matrix
-        A = self.copy()
-        
-        for p in range (n):
-            pivot = A.data[p][p]
-            if pivot == 0:
-                raise ValueError('Matrix is singular and cant be inverted')
-            
-            for j in range(n):
-                A.data[p][j] /= pivot
-                I[p][j] /= pivot
-            
-            for i in range(n):
-                if i != p:
-                    factor = A.data[i][p]
-                    for j in range(n):
-                        A.data[i][j] -= factor *A.data[p][j]
-                        I[i][j] -= factor *I[p][j]
-                        I[i][j] = round(I[i][j], 8)
-                        
-        for j in range(n):
-            I[n-1][j] = round(I[n-1][j], 8)
-        
-        return Array(I)
-    
     def sum(self):
         self_flat = self.flatten()
         sum = 0
@@ -303,6 +270,7 @@ class Array:
             if self_flat[i] == a:
                 return i
     
+    #TODO: calculate P - permutation matrix
     def LU_Decomposition(self):
         if self._LU is not None:
             return self._LU
@@ -326,7 +294,7 @@ class Array:
                 for j in range (p, n):
                     U.data[i][j] -= w*U.data[p][j]
         self._LU = (L, U)
-        return Array(L), U
+        return Array(L), U   
     
     def determinant(self):
         if self._det is not None:
@@ -338,34 +306,9 @@ class Array:
             det*= U.data[i][i]
         
         self._det = det
-        return det    
-    
-    def solve(self: Array, other: Array ):
-        if self.ndim != 2 or self.shape[0] != self.shape[1]:
-            raise ValueError('Solve function just can be applied on 2-D square matrix')
-        if self.shape[1] != other.shape[0] or other.ndim != 1:
-            raise ValueError('Target vector is invalid')
-        
-        n = self.shape[0]
-        
-        L, U = self.LU_Decomposition()
-        x_tide = [0]*n
-        for i in range(n):
-            s = 0
-            for j in range(i):
-                s += L.data[i][j]*x_tide[j]
-            x_tide[i] = other.data[i] - s
-        
-        x = [0] * n
-        for i in range(n-1, -1, -1):
-            s = 0
-            for j in range(i+1, n):
-                s += U.data[i][j]*x[j]
-            x[i] = (x_tide[i] - s)/U.data[i][i]
-        
-        return Array(x)
-        
-        
+        return det 
+
+
 # build the new nested list structure
 def _build_nested_list(flat_data, shape):
     if len(shape) == 0:
@@ -382,24 +325,35 @@ def _build_nested_list(flat_data, shape):
 def array(data):
     return Array(data)
 
-def _build(shape, fill_value):
+def _fill(shape:tuple, fill_value):
     if len(shape) == 0:
         return fill_value
     else:
-        return [_build(shape[1:], fill_value) for _ in range(shape[0])]
-    
-def zeros(shape):
-    data = _build(shape, 0)
+        return [_fill(shape[1:], fill_value) for _ in range(shape[0])]
+
+def zeros(shape:tuple):
+    data = _fill(shape, 0)
     return Array(data)
 
-def ones(shape):
-    data = _build(shape, 1)
+def ones(shape:tuple):
+    data = _fill(shape, 1)
     return Array(data)
 
-def eye(n):
-    data = _build((n, n), 0)
+def identity(n:int):
+    data = _fill((n, n), 0)
     for i in range(n):
         data[i][i] = 1
+    return Array(data)
+
+def eye(n: int, m = None, k: int = 0):
+    if m is None: 
+        m = n
+        
+    data = _fill((n, m), 0)
+    for i in range(min(n)):
+        j = i + k
+        if j < m:
+            data[i][j] = 1
     return Array(data)
 
 def arange(start, stop=None, step=1):
