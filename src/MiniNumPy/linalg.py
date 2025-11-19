@@ -1,5 +1,16 @@
 from MiniNumPy.Array import * 
 
+def dot(a: Array, b: Array):
+    dot = 0
+    if a.ndim == 1 and b.ndim ==1:
+        for i in range(len(a)):
+            dot += a[i]*b[i]
+        return dot 
+    else:
+        return a@b
+
+def matmul(a:Array, b: Array):
+    pass
 def norm(a, ord = 2)->float:
     if not isinstance(a,Array):
         raise ValueError("The input must be in Array type")

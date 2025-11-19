@@ -8,15 +8,15 @@ import MiniNumPy as mnp
 import numpy as np
 
 # 2D array
-a = mnp.array([[[[1, 2, 3], 
-               [4, 5, 6]]]])
-print(a/2)  # shape (3,2)
+a = mnp.array([1,1,1])
+print(a.shape)  # shape (3,2)
 print('-------')
 
 # 4D array
-c = mnp.array([[[[1], [2]], [[3], [4]]], 
-               [[[5], [6]], [[7], [8]]]])
-print(c)  # shape (2,2,2,1)
+c = mnp.array([[1,2],
+              [3,4],
+              [5,6]])
+print(mnp.linalg.dot(a,c))  # shape (2,2,2,1)
 
 print('-------')
 d = np.array([[2, 7, 1], 
@@ -24,9 +24,7 @@ d = np.array([[2, 7, 1],
                [1, 5, 3]])
 print(np.linalg.inv(d))
 
-e = mnp.array([[2, 7, 1], 
-               [3, -2, 0],
-               [1, 5, 3]])
+
 
 
 A = np.array([[2,7,1],
@@ -35,8 +33,11 @@ A = np.array([[2,7,1],
 
 b = np.array([1,2,3])
 
-print(np.linalg.inv(A))
+print(np.dot(A,b))
 print('-------')
+
+E = mnp.array([[2, 7, 1], 
+               [3, -2, 0],
+               [1, 5, 3]])
 f = mnp.array([1, 2, 3])
-print(mnp.linalg.inv(e))
-print(mnp.ones((3,2)))
+print(mnp.dot(E,f))

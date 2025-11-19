@@ -170,20 +170,37 @@ class Array:
         return self + (other * -1)
     
     def __matmul__(self:Array, other:Array)-> Array:
-        if self.ndim != 2 or other.ndim != 2:
-            raise ValueError("Both arrays must be 2-dimensional for matrix multiplication")
-        if self.shape[1] != other.shape[0]:
+        A = self.data
+        B = other.data
+        
+        if self.ndim == 1:
+            A = [A]
+        if other.ndim == 1:
+            B = [[b] for b in B]
+        
+        cols_A = len(A[0])
+        cols_B = len(B[0])
+        rows_A = len(A)
+        rows_B = len(B)
+        
+        if cols_A != rows_B:
             raise ValueError("Inner dimensions must match for matrix multiplication")
         
         result_data = []
-        for i in range(self.shape[0]):
+        for i in range(rows_A):
             row = []
-            for j in range(other.shape[1]):
+            for j in range(cols_B):
                 sum_product = 0
-                for k in range(self.shape[1]):
-                    sum_product += self.data[i][k] * other.data[k][j]
+                for k in range(cols_A):
+                    sum_product += A[i][k] * B[k][j]
                 row.append(sum_product)
             result_data.append(row)
+        
+        if self.ndim == 1:
+            return Array(result_data[0])
+        
+        if other.ndim ==1:
+            return Array([x[0] for x in result_data])
         
         return Array(result_data)
     
