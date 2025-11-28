@@ -1,0 +1,605 @@
+from __future__ import annotations
+import math
+
+# build the new nested list structure
+def build_nested_list(flat_data, shape, offset=0):
+    """
+    Build a nested list from flat_data using the given shape.
+    Returns (nested_list, next_offset).
+    """
+
+    # If shape empty → return a single element
+    if len(shape) == 0:
+        return flat_data[offset], offset + 1
+
+    # allocate this level
+    dim = shape[0]
+    sub_shape = shape[1:]
+    nested_list = []
+
+    # recursively fill
+    for _ in range(dim):
+        item, offset = build_nested_list(flat_data, sub_shape, offset)
+        nested_list.append(item)
+
+    return nested_list, offset
+    
+def array(data):
+    return Array(data)
+
+def _fill(shape:tuple, fill_value):
+    if len(shape) == 0:
+        return fill_value
+    else:
+        return [_fill(shape[1:], fill_value) for _ in range(shape[0])]
+
+def zeros(shape:tuple):
+    data = _fill(shape, 0)
+    return Array(data)
+
+def ones(shape:tuple):
+    data = _fill(shape, 1)
+    return Array(data)
+
+def identity(n:int):
+    data = _fill((n, n), 0)
+    for i in range(n):
+        data[i][i] = 1
+    return Array(data)
+
+def eye(n: int, m = None, k: int = 0):
+    if m is None: 
+        m = n
+        
+    data = _fill((n, m), 0)
+    for i in range(min(n)):
+        j = i + k
+        if j < m:
+            data[i][j] = 1
+    return Array(data)
+
+def arange(start, stop=None, step=1):
+    if stop is None:
+        stop = start
+        start = 0
+    data = []
+    value = start
+    while (step > 0 and value < stop) or (step < 0 and value > stop):
+        data.append(value)
+        value += step
+    return Array(data)
+
+def linspace(start, stop, num=50):
+    if num <= 0:
+        return Array([])
+    if num == 1:
+        return Array([start])
+    step = (stop - start) / (num - 1)
+    data = [start + i * step for i in range(num)]
+    return Array(data)
+
+def index_to_coord(index,shape):
+    coord = []
+    
+    for i in reversed(shape):
+        coord.append(index%i)
+        index //= i
+    coord.reverse()
+    return tuple(coord)
+
+def coord_to_index(coord, shape):
+    index = 0
+    
+    for i in range(len(shape)):
+        index = index*shape[i] + coord[i]
+    return index
+
+def prod(shape):
+    p = 1
+    for x in shape:
+        p *= x
+    return p
+
+class Array:
+    def __init__(self,data):
+        self.data = data
+        
+        self.shape = self._get_shape(data)
+        
+        self.ndim = len(self.shape)
+        
+        self.size = self._get_size(self.shape)
+
+        self._LU = None
+        
+        self._det = None
+
+
+    def _get_shape(self, data)-> tuple:
+        """Get shape of data using recursive function
+
+        Args:
+            data (list, nested listed or scalar): 
+                A nested list representing an n-dimensional array. Scalar is the input of the deepest level
+        Returns:
+            shape (tuple): Shape of the nested list
+        """
+        if isinstance(data, list):
+            if len(data) == 0:
+                return (0,)
+            else:
+                return (len(data),) + self._get_shape(data[0])
+        else:
+            return ()
+        
+    def _get_size(self, shape: tuple)-> int:
+        """Compute the total number of elements in an Array from its shape.
+
+        Args:
+            shape(tuple): Array's shape
+
+        Returns:
+            size(int): Total number of element in an Array
+        """
+        return prod(shape)
+
+
+    def flatten (self):
+        """Flatten an n-dimensional Array into a 1D Python list.
+
+        Returns:
+            Flattened Array (list): List A 1D Python list containing all scalar elements of the array,
+            in row-major order.
+        """
+        flattened_array = []
+        def _flat(arr):
+            for x in arr:
+                if not isinstance(x,list):
+                    flattened_array.append(x)
+                else:
+                    _flat(x)
+        _flat(self.data)
+        return flattened_array
+
+
+    def reshape(self, new_shape:tuple)-> Array:
+        """  Return a new Array with the same data but a different shape.
+
+        Args:
+            new_shape (tuple): The desired shape of the output array
+
+        Raises:
+            ValueError: If the total number of elements implied by `new_shape` does not
+                        match the size of the original array.
+
+        Returns:
+            new Array (Array): A new Array instance whose data is the same as the original,
+                                but arranged according to `new_shape`.
+        """
+        # check if the new shape is compatible with the current size
+        new_size = self._get_size(new_shape)
+        if new_size != self.size:
+            raise ValueError(f"Cannot reshape array of size {self.size} into shape {new_shape}.")
+        
+        # flatten the data
+        flat_data = self.flatten()
+        
+        new_data, _ = build_nested_list(flat_data, new_shape)
+        return Array(new_data)
+    
+    # TODO: understand this function
+    def __str__(self):
+        """ Return a formatted string representation of the Array.
+        """
+        def format_array(arr, shape, level=0):
+            if len(shape) == 1:
+                return '[' + ' '.join(map(str, arr)) + ']' 
+            else:
+                step = int(len(arr) / shape[0])
+                rows = []
+                for i in range(shape[0]):
+                    part = arr[i*step:(i+1)*step]
+                    rows.append(format_array(part, shape[1:], level+1))
+                newlines = '\n' * (len(shape) - 1)
+                indent = ' ' * (level + 1)
+                newline = newlines + indent
+                return '[' + newline.join(rows) + ']'
+        
+        return format_array(self.flatten(), self.shape)
+    
+    def copy(self):
+        """Return a deep copy the Array
+        """
+        new_data = [row[:] for row in self.data]
+        return Array(new_data)
+
+    def get_col(self, index: int)-> Array:
+        """Return a column of the 2D Array as a new Array.
+
+        Args:
+            index (int): The index of the column to extract
+
+        Raises:
+            ValueError: If the Array is not 2-dimensional.
+            IndexError: If the column index is out of bounds
+        """
+        if self.ndim != 2:
+            raise ValueError("get_col method only supports 2D arrays")
+        if index < 0 or index >= self.shape[1]:
+            raise IndexError("Column index out of range")
+        
+        col_data = [[self.data[i][index]] for i in range(self.shape[0])]
+        return Array(col_data)
+    
+    def set_col(self, index:int, col:Array):
+        """Replace a column of the 2D Array with the values from another Array.
+
+        Args:
+            index (int): The column index to replace.
+            col (Array): A column vector (n,1) whose values will overwrite the
+                        specified column of the current Array. 
+
+        Raises:
+            ValueError: If the Array is not 2-dimensional.
+            IndexError: If the column index is out of bounds
+            ValueError: If shape of new column is not matched with the Array shape
+        """
+        if self.ndim != 2:
+            raise ValueError("set_col method only supports 2D arrays")
+        if index < 0 or index >= self.shape[1]:
+            raise IndexError("Column index out of range")
+        if col.shape[0] != self.shape[0]:
+            raise ValueError("Column array has incompatible shape")
+        
+        for i in range(self.shape[0]):
+            self.data[i][index] = col.data[i][0]
+    
+    @property
+    def T(self):
+        return self.transpose()
+
+    def transpose(self, axes = None)-> Array:
+        """Permute the axes of the Array and return a new transposed Array.
+            The operation constructs a new Array by:
+                1. Flattening the original data,
+                2. Mapping each element's coordinate under the new axis order,
+                3. Reshaping the permuted flat list into the new shape.
+        Args:
+            axes (tuple, optional): Desired ordering of axes. Defaults to None.
+
+        Raises:
+            ValueError: If the length of axes does not match the Array.ndim
+            ValueError: If the axes does not contain interger from 0 to Array.ndim -1
+
+        Returns:
+            Array: A new Array with its axes permuted according to `axes`.
+        """
+        old_shape = self.shape
+        
+        if axes is None:
+            axes = tuple(x for x in range(self.ndim - 1, -1, -1))
+
+        if len(axes) != self.ndim:
+            raise ValueError("Axes don't match array")
+        if sorted(axes) != list(range(self.ndim)):
+            raise ValueError("Invalid axes for transpose")
+        
+        new_shape = tuple(old_shape[axis] for axis in axes)
+        
+        flat = self.flatten()
+        new_flat = [0] * len(flat)
+        
+        for old_index in range(len(flat)):
+            old_coord = index_to_coord(old_index, old_shape)
+            new_coord = tuple(old_coord[axis] for axis in axes)
+            new_index = coord_to_index(new_coord, new_shape)
+            new_flat[new_index] = flat[old_index]
+
+        new_data, _ = build_nested_list(new_flat, new_shape)
+        return Array(new_data)
+    
+    ################################################Elementwise Operations#####################################################
+    def __add__(self:Array, other:Array)-> Array:
+        """ Element-wise addition of two Arrays
+
+        Args:
+            self (Array): First Array
+            other (Array): Second Array
+
+        Raises:
+            ValueError: If the two Arrays do not have the same size.
+
+        Returns:
+            Array: A new Array whose elements are the sum of the corresponding elements of self and other.
+        """
+        self_flat = self.flatten()
+        other_flat = other.flatten()
+        
+        if len(self_flat) != len(other_flat):
+            raise ValueError("Arrays must have the same size for addition")
+        
+        result_flat = [a + b for a, b in zip(self_flat, other_flat)]
+        result_data, _ = build_nested_list(result_flat, self.shape)
+        return Array(result_data)
+    
+    def __mul__(self:Array, other:float)-> Array:
+        """ Element-wise multiplication of an Array by a scalar.
+
+        Args:
+            self (Array): The Array to be scaled.
+            other (float): The scalar multiplier.
+
+        Returns:
+            Array: A new Array whose elements are the elements of self multiplied by other.
+        """
+        self_flat = self.flatten() # O(n)
+        
+        result_flat = [a * other for a in self_flat] # O(n)
+        result_data, _ = build_nested_list(result_flat, self.shape) # O(n)
+        return Array(result_data)
+    
+    def __sub__(self:Array, other:Array)-> Array:
+        """ Element-wise subtraction of two Arrays.
+
+        Args:
+            self (Array): The minuend Array.
+            other (Array): The subtrahend Array.
+
+        Returns:
+            Array: A new Array whose elements are the difference between the corresponding elements of self and other.
+        """
+        return self + (other * -1)
+    
+    def __matmul__(self:Array, other:Array)-> Array:
+        """ Matrix multiplication of two Arrays. 2D Arrays or 1D Arrays are supported.
+
+        Args:
+            self (Array): First Array
+            other (Array): Second Array
+
+        Raises:
+            ValueError: If the inner dimensions do not match for matrix multiplication.
+
+        Returns:
+            Array: A new Array resulting from the matrix multiplication of self and other.
+        """
+        A = self.data
+        B = other.data
+        
+        if self.ndim == 1:
+            A = [A]
+        if other.ndim == 1:
+            B = [[b] for b in B]
+        
+        cols_A = len(A[0])
+        cols_B = len(B[0])
+        rows_A = len(A)
+        rows_B = len(B)
+        
+        if cols_A != rows_B:
+            raise ValueError("Inner dimensions must match for matrix multiplication")
+        
+        result_data = []
+        for i in range(rows_A):
+            row = []
+            for j in range(cols_B):
+                sum_product = 0
+                for k in range(cols_A):
+                    sum_product += A[i][k] * B[k][j]
+                row.append(sum_product)
+            result_data.append(row)
+        
+        if self.ndim == 1:
+            return Array(result_data[0])
+        
+        if other.ndim ==1:
+            return Array([x[0] for x in result_data])
+        
+        return Array(result_data)
+    
+    def __truediv__(self:Array, other:float)-> Array:
+        """Element-wise division of an Array by a scalar.
+
+        Args:
+            self (Array): The Array to be divided.
+            other (float): The scalar divisor.
+
+        Returns:
+            Array: A new Array whose elements are the elements of self divided by other.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [a / other for a in self_flat]
+        result_data, _ = build_nested_list(result_flat, self.shape)
+        return Array(result_data)
+    
+    def __pow__(self:Array, other:float)-> Array:
+        """Element-wise exponentiation of an Array by a scalar.
+
+        Args:
+            self (Array): The base Array.
+            other (float): The exponent.
+
+        Returns:
+            Array: A new Array whose elements are the elements of self raised to the power of other.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [a ** other for a in self_flat]
+        result_data, _ = build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def exp(self)-> Array:
+        """Compute the element-wise exponential of the Array.
+
+        Returns:
+            Array: A new Array whose elements are the exponential of the corresponding elements of self.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [math.exp(a) for a in self_flat]
+        result_data, _ = build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def log(self)-> Array:
+        """Compute the element-wise natural logarithm of the Array.
+
+        Returns:
+            _type_: A new Array whose elements are the natural logarithm of the corresponding elements of self.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [math.log(a) for a in self_flat]
+        result_data, _ = build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def abs(self)-> Array:
+        """Compute the element-wise absolute value of the Array.
+
+        Returns:
+            Array: A new Array whose elements are the absolute values of the corresponding elements of self.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [math.abs(a) for a in self_flat]
+        result_data, _ = build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def sqrt(self)-> Array:
+        """Compute the element-wise square root of the Array.
+
+        Returns:
+            Array: A new Array whose elements are the square roots of the corresponding elements of self.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [math.sqrt(a) for a in self_flat]
+        result_data, _ = build_nested_list(result_flat,self.shape)
+        return Array(result_data)
+    
+    def sum(self)-> float:
+        """Compute the sum of all elements in the Array.
+
+        Returns:
+            float: The sum of all elements.
+        """
+        self_flat = self.flatten()
+        sum = 0
+        for i in range(len(self_flat)):
+            sum += self_flat[i]
+        return float(sum)
+    
+    def mean(self)-> float:
+        """Compute the mean (average) of all elements in the Array.
+
+        Returns:
+            float: The mean of all elements.
+        """
+        self_flat = self.flatten()
+        return float(sum(self_flat) / len(self_flat))
+    
+    def max(self)-> float:
+        """Compute the maximum value among all elements in the Array.
+
+        Returns:
+            float: The maximum value.
+        """
+        self_flat = self.flatten()
+        max = self_flat[0] 
+        for i in range(1, len(self_flat)):
+            if self_flat[i] > max:
+                max = self_flat[i]
+        return float(max)
+    
+    def min(self)-> float:
+        """Compute the minimum value among all elements in the Array.
+
+        Returns:
+            float: The minimum value.
+        """
+        self_flat = self.flatten()
+        min = self_flat[0] 
+        for i in range(1, len(self_flat)):
+            if self_flat[i] < min:
+                min = self_flat[i]
+        return float(min)
+
+    def arg_min(self)-> tuple:
+        """Find the indices of the minimum value in the Array.
+
+        Returns:
+            tuple: The indices of the minimum value as a tuple.
+        """
+        self_flat = self.flatten()
+        a = min(self_flat)
+        for i in range(len(self_flat)):
+            if self_flat[i] == a:
+                return index_to_coord(i,self.shape)
+            
+    def arg_max(self)-> tuple:
+        """Find the indices of the maximum value in the Array.
+
+        Returns:
+            tuple: The indices of the maximum value as a tuple.
+        """
+        self_flat = self.flatten()
+        a = max(self_flat)
+        for i in range(len(self_flat)):
+            if self_flat[i] == a:
+                return  index_to_coord(i,self.shape)
+    
+    #TODO: calculate P - permutation matrix
+    def LU_Decomposition(self):
+        """Perform LU Decomposition of a square Array using Doolittle's method.
+            Idea: A = LU
+            where L is lower triangular matrix with unit diagonal elements
+            and U is upper triangular matrix.
+
+        Raises:
+            ValueError: If the Array is not square.
+            ValueError: If a zero pivot is encountered (no pivoting implemented).
+
+        Returns:
+            L (Array): Lower triangular matrix with unit diagonal elements.
+            U (Array): Upper triangular matrix.
+        """
+        if self._LU is not None:
+            return self._LU
+        
+        n = self.shape[0]
+        if n != self.shape[1]:
+            raise ValueError("LU decomposition requires a square matrix")
+
+        L = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+        U = self.copy()
+
+        for p in range (n-1):
+            pivot = U.data[p][p]
+            if pivot == 0:
+                raise ValueError("Zero pivot encountered — pivoting required")
+
+            for i in range(p+1, n):
+                w = U.data[i][p]/pivot
+                L[i][p] = w
+                
+                for j in range (p, n):
+                    U.data[i][j] -= w*U.data[p][j]
+        self._LU = (L, U)
+        return Array(L), U   
+    
+    def determinant(self)-> float:
+        """Compute the determinant of a square Array using its LU Decomposition.
+
+        Returns:
+            float: The determinant of the Array.
+        """
+        if self._det is not None:
+            return self._det
+        
+        L, U = self.LU_Decomposition()
+        det = 1
+        for i in range(self.shape[0]):
+            det*= U.data[i][i]
+        
+        self._det = det
+        return det 
