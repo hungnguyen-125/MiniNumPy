@@ -24,4 +24,4 @@ HK = mnp.zeros((4,1,2,1))
 TD = mnp.zeros((4,3,1,2))
 
 print(mnp.matmul(HK,TD).size)
-print((1,2,3)+(0,))
+print(mnp.linspace(0,10,5))

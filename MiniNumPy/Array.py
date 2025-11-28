@@ -1,11 +1,18 @@
 from __future__ import annotations
 import math
 
-# build the new nested list structure
-def build_nested_list(flat_data, shape, offset=0):
-    """
-    Build a nested list from flat_data using the given shape.
-    Returns (nested_list, next_offset).
+def build_nested_list(flat_data:list, shape:tuple, offset=0):
+    """Build a nested list from a flat list based on the given shape.
+
+    Args:
+        flat_data (list): A flat list containing the data elements.
+        shape (tuple): The desired shape of the nested list.
+        offset (int, optional): The starting index in flat_data from which to read. This is used
+        internally during recursion. Defaults to 0.
+
+    Returns:
+        nested_list: A nested list structured according to the specified shape.
+        offset: The updated offset after building the nested list.
     """
 
     # If shape empty → return a single element
@@ -27,38 +34,93 @@ def build_nested_list(flat_data, shape, offset=0):
 def array(data):
     return Array(data)
 
-def _fill(shape:tuple, fill_value):
+def _fill(shape:tuple, fill_value:float)->list:
+    """Helper function to create a nested list filled with a specific value.
+
+    Args:
+        shape (tuple): The shape of the nested list to create.
+        fill_value (float): The value to fill the nested list with.
+
+    Returns:
+        list: The nested list filled with the specified value.
+    """
     if len(shape) == 0:
         return fill_value
     else:
         return [_fill(shape[1:], fill_value) for _ in range(shape[0])]
 
-def zeros(shape:tuple):
+def zeros(shape:tuple)->Array:
+    """Create an Array filled with zeros.
+
+    Args:
+        shape (tuple): Shape of the Array
+
+    Returns:
+        Array: An Array of the specified shape filled with zeros.
+    """
     data = _fill(shape, 0)
     return Array(data)
 
-def ones(shape:tuple):
+def ones(shape:tuple)->Array:
+    """Create an Array filled with ones.
+
+    Args:
+        shape (tuple): Shape of the Array
+
+    Returns:
+        Array: An Array of the specified shape filled with ones.
+    """
     data = _fill(shape, 1)
     return Array(data)
 
-def identity(n:int):
+def identity(n:int)->Array:
+    """Create an identity matrix of size n x n.
+
+    Args:
+        n (int): Size of the identity matrix
+
+    Returns:
+        Array: An n x n identity matrix as an Array.
+    """
     data = _fill((n, n), 0)
     for i in range(n):
         data[i][i] = 1
     return Array(data)
 
-def eye(n: int, m = None, k: int = 0):
+def eye(n: int, m = None, offset: int = 0)->Array:
+    """Create a 2D Array with ones on a specified diagonal and zeros elsewhere.
+        - If offset = 0 => main diagonal.
+        - If offset > 0 => diagonal shifted to the right "offset" columns.
+        - If offset < 0 => diagonal shifted downward "offset" rows.
+    Args:
+        n (int): Number of rows.
+        m (int, optional): Number of column. Defaults to None.
+        offset (int, optional): Index of the diagonal. Defaults to 0.
+
+    Returns:
+        Array: A 2D Array with ones on the specified diagonal and zeros elsewhere.
+    """
     if m is None: 
         m = n
         
     data = _fill((n, m), 0)
-    for i in range(min(n)):
-        j = i + k
-        if j < m:
+    for i in range(n):
+        j = i + offset
+        if 0 <= j < m:
             data[i][j] = 1
     return Array(data)
 
-def arange(start, stop=None, step=1):
+def arange(start:float, stop=None, step=1)-> Array:
+    """Create a 1D Array with evenly spaced values within a given interval.
+
+    Args:
+        start (float): Start of the interval.
+        stop (float, optional): End of the interval. Defaults to None.
+        step (float, optional): The spacing between values. Defaults to 1.
+
+    Returns:
+        Array: A 1D Array containing evenly spaced values.
+    """
     if stop is None:
         stop = start
         start = 0
@@ -69,7 +131,17 @@ def arange(start, stop=None, step=1):
         value += step
     return Array(data)
 
-def linspace(start, stop, num=50):
+def linspace(start:float, stop:float, num=50) -> Array:
+    """Create a 1D Array with evenly spaced values over a specified interval.
+
+    Args:
+        start (float): Start of the interval.
+        stop (float): End of the interval.
+        num (int, optional): Number of elements . Defaults to 50.
+
+    Returns:
+        Array: A 1D Array containing num evenly spaced values from start to stop.
+    """
     if num <= 0:
         return Array([])
     if num == 1:
@@ -78,7 +150,16 @@ def linspace(start, stop, num=50):
     data = [start + i * step for i in range(num)]
     return Array(data)
 
-def index_to_coord(index,shape):
+def index_to_coord(index:int,shape:tuple)-> tuple:
+    """Convert a flat index to multi-dimensional coordinates based on the given shape.
+
+    Args:
+        index (int): The flat index to convert.
+        shape (tuple): The shape of the multi-dimensional array.
+
+    Returns:
+        tuple: The multi-dimensional coordinates corresponding to the flat index.
+    """
     coord = []
     
     for i in reversed(shape):
@@ -87,19 +168,27 @@ def index_to_coord(index,shape):
     coord.reverse()
     return tuple(coord)
 
-def coord_to_index(coord, shape):
+def coord_to_index(coord:tuple, shape:tuple)-> int:
+    """Convert multi-dimensional coordinates to a flat index based on the given shape.
+
+    Args:
+        coord (tuple): The multi-dimensional coordinates to convert.
+        shape (tuple): The shape of the multi-dimensional array.
+
+    Returns:
+        int: The flat index corresponding to the multi-dimensional coordinates.
+    """
     index = 0
     
     for i in range(len(shape)):
         index = index*shape[i] + coord[i]
-    return index
+    return int(index)
 
 def prod(shape):
     p = 1
     for x in shape:
         p *= x
     return p
-
 class Array:
     def __init__(self,data):
         self.data = data

@@ -2,6 +2,16 @@ from MiniNumPy.Array import *
 import random
 
 def dot(a: Array, b: Array):
+    """ Dot product of two arrays.
+
+    Args:
+        a (Array): First input array.
+        b (Array): Second input array.
+
+    Returns:
+        int : if both inputs are 1-D arrays, returns the dot product as a scalar.
+        Array : if either input is a multi-dimensional array, returns the matrix product.
+    """
     dot = 0
     if a.ndim == 1 and b.ndim ==1:
         for i in range(len(a)):
@@ -10,7 +20,20 @@ def dot(a: Array, b: Array):
     else:
         return a@b
 
-def matmul(A: Array, B: Array):
+def matmul(A: Array, B: Array)-> Array:
+    """ General matrix multiplication of two arrays A and B with broadcasting support.
+
+    Args:
+        A (Array): First input array.
+        B (Array): Second input array.
+
+    Raises:
+        ValueError: If the last dimensions of A and B are incompatible for matrix multiplication.
+        ValueError: If the batch dimensions of A and B cannot be broadcast together.
+
+    Returns:
+        Array: The result of the matrix multiplication with broadcasting applied.
+    """
     # ---------- STEP 1: Check last dims ----------
     if A.shape[-1] != B.shape[-2]:
         raise ValueError("matmul: last dims mismatch")
@@ -93,7 +116,16 @@ def matmul(A: Array, B: Array):
     nested, _ = build_nested_list(out_flat, out_shape)
     return Array(nested)
 
-def broadcast_shapes(shapeA: tuple, shapeB: tuple):
+def broadcast_shapes(shapeA: tuple, shapeB: tuple)-> tuple:
+    """Help function to broadcast two shapes.
+
+    Args:
+        shapeA (tuple): Shape of first array.
+        shapeB (tuple): Shape of second array.
+
+    Returns:
+        tuple: The broadcasted shape, or None if they cannot be broadcast together.
+    """
     a = list(shapeA)[::-1]
     b = list(shapeB)[::-1]
     out = []
@@ -112,7 +144,19 @@ def broadcast_shapes(shapeA: tuple, shapeB: tuple):
             return None
     return tuple(out[::-1])
 
-def norm(a, ord = 2)->float:
+def norm(a:Array, ord = 2)->float:
+    """Calculate the norm of an array.
+
+    Args:
+        a (Array): Input Array.
+        ord (int, optional): The norm order. Defaults to 2.
+
+    Raises:
+        ValueError: If the input is not of Array type.
+
+    Returns:
+        float: The calculated norm of the array.
+    """
     if not isinstance(a,Array):
         raise ValueError("The input must be in Array type")
     
@@ -181,7 +225,19 @@ def solve(A: Array, B: Array) -> Array:
     return X
 
 #TODO: Practice more on using pivot
-def inv(a:Array):
+def inv(a:Array)->Array:
+    """Calculate the inverse of a square matrix using Gauss-Jordan elimination.
+
+    Args:
+        a (Array): Input square matrix.
+
+    Raises:
+        ValueError: If the input matrix is not square.
+        ValueError: If the matrix is singular and cannot be inverted.
+
+    Returns:
+        Array: The inverse of the input matrix.
+    """
     if a.ndim != 2 or a.shape[0] != a.shape[1]:
         raise ValueError("Only square 2D arrays can be inverted")
     
@@ -215,6 +271,19 @@ def inv(a:Array):
 #TODO: Eigenvalue using QRD
 
 def qr_decomposition(A: Array):
+    """ Calculate the QR decomposition of matrix A using the Gram-Schmidt process.
+        Idea: A = Q R
+        where:
+            Q: orthogonal matrix (columns are orthonormal vectors)
+            R: upper triangular matrix
+            
+    Args:
+        A (Array): Input matrix to decompose.
+
+    Returns:
+        Q (Array) : Orthogonal matrix.
+        R (Array) : Upper triangular matrix.
+    """
     m, n = A.shape
 
     Q = zeros((m, n))
@@ -238,6 +307,20 @@ def qr_decomposition(A: Array):
 
 
 def eig(B:Array, max_iter=200, eps=1e-6):
+    """Calculate the eigenvalues and eigenvectors of a square matrix using the QR algorithm.
+
+    Args:
+        B (Array): Input square matrix.
+        max_iter (int, optional): Maximum number of iteration. Defaults to 200.
+        eps (float, optional): Convergence thresshold. Defaults to 1e-6.
+
+    Raises:
+        ValueError: If the input matrix is not square.
+
+    Returns:
+        eigenvalues (Array): The eigenvalues of the matrix.
+        V (Array): The eigenvectors of the matrix as columns.
+    """
     if B.ndim != 2 or B.shape[0] != B.shape[1]:
         raise ValueError("Eigenvalue computation only supports square 2D arrays")
     
