@@ -14,8 +14,13 @@ def dot(a: Array, b: Array):
     """
     dot = 0
     if a.ndim == 1 and b.ndim ==1:
-        for i in range(len(a)):
-            dot += a[i]*b[i]
+        for i in range(a.size):
+            dot += a.data[i]*b.data[i]
+        return dot 
+    
+    if a.shape[1] == 1 and b.shape[1] == 1:
+        for i in range(a.size):
+            dot += a.data[i][0]*b.data[i][0]
         return dot 
     else:
         return a@b
@@ -144,7 +149,7 @@ def broadcast_shapes(shapeA: tuple, shapeB: tuple)-> tuple:
             return None
     return tuple(out[::-1])
 
-def norm(a:Array, ord = 2)->float:
+def norm(a:Array, ord = None)->float:
     """Calculate the norm of an array.
 
     Args:
@@ -160,12 +165,59 @@ def norm(a:Array, ord = 2)->float:
     if not isinstance(a,Array):
         raise ValueError("The input must be in Array type")
     
-    a_flat = a.flatten()
-    norm = 0
-    for i in a_flat:
-        norm += i**ord
-    return float(norm**(1/ord))
+    if a.ndim !=2:
+        a_flat = a.flatten()
+        vals = [abs(x) for x in a_flat]
+        
+        if ord == None or ord == 2:
+            norm = 0
+            for i in a_flat:
+                norm += i**2
+            return float(math.sqrt(norm))
+        
+        if ord == 1:
+            norm = 0
+            for i in vals:
+                norm += i
+            return float(norm)
+        
+        if ord == 3:
+            return float(max(vals))
+    
+    if ord == None:
+        a_flat = a.flatten()
+        norm = 0
+        for i in a_flat:
+            norm += i**2
+        return float(math.sqrt(norm))    
+    
+    # Max column sum 
+    if ord == 1:
+        cols_sum = []
+        for j in range(a.shape[1]):
+            s = 0
+            cols = a.get_col(j)
+            for i in range(a.shape[0]):
+                s += abs(cols.data[i][0])
+            cols_sum.append(s)
+        return float(max(cols_sum))
+    
+    # Max row sum 
+    if ord == 3:
+        rows_sum = []
+        for i in range(a.shape[0]):
+            s = 0 
+            rows = a.get_row(i)
+            for j in range(a.shape[1]):
+                s+= abs(rows.data[j])
+            rows_sum.append(s)
+        return float(max(rows_sum))
 
+    if ord ==2:
+        ATA = a.T@a
+        eigenvalue,_ = eig(ATA)
+        return eigenvalue.max()**0.5
+    
 def det(a:Array):
     return a.determinant()
 
@@ -187,7 +239,10 @@ def solve(A: Array, B: Array) -> Array:
         raise ValueError("A must be a square 2D matrix")
 
     n = A.shape[0]
-
+    
+     # Compute LU decomposition of A
+    P, L, U = A.LU_Decomposition()
+    
     # Convert B into a proper 2-D matrix form (column vectors)
     if B.ndim == 1:
         # Convert shape (n,) → (n,1)
@@ -197,12 +252,11 @@ def solve(A: Array, B: Array) -> Array:
         Bmat = B.copy()
     else:
         raise ValueError("B must have shape (n,), (n,1), or (n,k)")
-
-    # Compute LU decomposition of A
-    L, U = A.LU_Decomposition()
-
+    
+    Bmat = P @ Bmat
+        
     # Number of columns of B (number of RHS vectors)
-    k = Bmat.shape[1] if Bmat.ndim == 2 else 1
+    k = Bmat.shape[1]
 
     # Forward substitution: solve L Y = B
     Y = zeros((n, k))
@@ -222,9 +276,8 @@ def solve(A: Array, B: Array) -> Array:
                 s += U.data[i][j] * X.data[j][col]
             X.data[i][col] = (Y.data[i][col] - s) / U.data[i][i]
 
-    return X
+    return X 
 
-#TODO: Practice more on using pivot
 def inv(a:Array)->Array:
     """Calculate the inverse of a square matrix using Gauss-Jordan elimination.
 
@@ -242,31 +295,35 @@ def inv(a:Array)->Array:
         raise ValueError("Only square 2D arrays can be inverted")
     
     n = a.shape[0]
-    # Create an identity matrix of the same size
-    I = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
-    # Create a copy of the original matrix
+
+    I = identity(n)
     A = a.copy()
     
     for p in range (n):
+        
+        if A.data[p][p] == 0:
+            for r in range(p + 1, n):
+                if A.data[r][p] != 0:
+                    A.data[p], A.data[r] = A.data[r], A.data[p]
+                    I.data[p], I.data[r] = I.data[r], I.data[p]
+                    break
+            else:
+                raise ValueError("Matrix is singular and cannot be inverted")
+            
         pivot = A.data[p][p]
-        if pivot == 0:
-            raise ValueError('Matrix is singular and cant be inverted')
         
         for j in range(n):
             A.data[p][j] /= pivot
-            I[p][j] /= pivot
+            I.data[p][j] /= pivot
         
         for i in range(n):
             if i != p:
                 factor = A.data[i][p]
                 for j in range(n):
                     A.data[i][j] -= factor *A.data[p][j]
-                    I[i][j] -= factor *I[p][j]
-                    
-    for j in range(n):
-        I[n-1][j] = I[n-1][j]
+                    I.data[i][j] -= factor *I.data[p][j]
     
-    return Array(I)
+    return I
 
 #TODO: Eigenvalue using QRD
 
@@ -294,7 +351,7 @@ def qr_decomposition(A: Array):
 
         for i in range(j):
             qi = Q.get_col(i) # m x 1
-            R.data[i][j] = (qi.transpose() @ v).data[0][0] # (m x 1).T @ (m x 1) = (1 x 1)
+            R.data[i][j] = dot(qi,v) 
             v = v - qi * R.data[i][j]
 
         norm_v = norm(v)
@@ -304,7 +361,6 @@ def qr_decomposition(A: Array):
         Q.set_col(j, qj)
 
     return Q, R
-
 
 def eig(B:Array, max_iter=200, eps=1e-6):
     """Calculate the eigenvalues and eigenvectors of a square matrix using the QR algorithm.
@@ -362,6 +418,4 @@ def eig(B:Array, max_iter=200, eps=1e-6):
     
     # # pack columns
     # V_final = Array(eigenvectors).transpose()
-    print(Array(eigenvalues))
-    print(V)
     return Array(eigenvalues), V

@@ -7,7 +7,7 @@ def build_nested_list(flat_data:list, shape:tuple, offset=0):
     Args:
         flat_data (list): A flat list containing the data elements.
         shape (tuple): The desired shape of the nested list.
-        offset (int, optional): The starting index in flat_data from which to read. This is used
+        offset (int, optional): Work as a pointer point to the data will take in next loop (tracking pointer). This is used
         internally during recursion. Defaults to 0.
 
     Returns:
@@ -33,7 +33,7 @@ def build_nested_list(flat_data:list, shape:tuple, offset=0):
     
 def array(data):
     return Array(data)
-
+    
 def _fill(shape:tuple, fill_value:float)->list:
     """Helper function to create a nested list filled with a specific value.
 
@@ -44,10 +44,10 @@ def _fill(shape:tuple, fill_value:float)->list:
     Returns:
         list: The nested list filled with the specified value.
     """
-    if len(shape) == 0:
-        return fill_value
-    else:
-        return [_fill(shape[1:], fill_value) for _ in range(shape[0])]
+    size = prod(shape)
+    flat = [fill_value]*size
+    filled_arr, _ = build_nested_list(flat,shape)
+    return filled_arr
 
 def zeros(shape:tuple)->Array:
     """Create an Array filled with zeros.
@@ -198,6 +198,8 @@ class Array:
         self.ndim = len(self.shape)
         
         self.size = self._get_size(self.shape)
+        
+        self._swap_count = 0
 
         self._LU = None
         
@@ -232,6 +234,54 @@ class Array:
         """
         return prod(shape)
 
+    def get_col(self, index: int)-> Array:
+        """Return a column of the 2D Array as a new Array.
+
+        Args:
+            index (int): The index of the column to extract
+
+        Raises:
+            ValueError: If the Array is not 2-dimensional.
+            IndexError: If the column index is out of bounds
+        """
+        if self.ndim != 2:
+            raise ValueError("get_col method only supports 2D arrays")
+        if index < 0 or index >= self.shape[1]:
+            raise IndexError("Column index out of range")
+        
+        col_data = [[self.data[i][index]] for i in range(self.shape[0])]
+        return Array(col_data)
+    
+    def set_col(self, index:int, col:Array):
+        """Replace a column of the 2D Array with the values from another Array.
+
+        Args:
+            index (int): The column index to replace.
+            col (Array): A column vector (n,1) whose values will overwrite the
+                        specified column of the current Array. 
+
+        Raises:
+            ValueError: If the Array is not 2-dimensional.
+            IndexError: If the column index is out of bounds
+            ValueError: If shape of new column is not matched with the Array shape
+        """
+        if self.ndim != 2:
+            raise ValueError("set_col method only supports 2D arrays")
+        if index < 0 or index >= self.shape[1]:
+            raise IndexError("Column index out of range")
+        if col.shape[0] != self.shape[0]:
+            raise ValueError("Column array has incompatible shape")
+        
+        for i in range(self.shape[0]):
+            self.data[i][index] = col.data[i][0]
+            
+    def get_row(self, index: int):
+        if self.ndim != 2:
+            raise ValueError("get_row method only supports 2D arrays")
+        if index < 0 or index >= self.shape[0]:
+            raise IndexError("Row index out of range")
+        
+        return Array(self.data[index])
 
     def flatten (self):
         """Flatten an n-dimensional Array into a 1D Python list.
@@ -301,47 +351,6 @@ class Array:
         """
         new_data = [row[:] for row in self.data]
         return Array(new_data)
-
-    def get_col(self, index: int)-> Array:
-        """Return a column of the 2D Array as a new Array.
-
-        Args:
-            index (int): The index of the column to extract
-
-        Raises:
-            ValueError: If the Array is not 2-dimensional.
-            IndexError: If the column index is out of bounds
-        """
-        if self.ndim != 2:
-            raise ValueError("get_col method only supports 2D arrays")
-        if index < 0 or index >= self.shape[1]:
-            raise IndexError("Column index out of range")
-        
-        col_data = [[self.data[i][index]] for i in range(self.shape[0])]
-        return Array(col_data)
-    
-    def set_col(self, index:int, col:Array):
-        """Replace a column of the 2D Array with the values from another Array.
-
-        Args:
-            index (int): The column index to replace.
-            col (Array): A column vector (n,1) whose values will overwrite the
-                        specified column of the current Array. 
-
-        Raises:
-            ValueError: If the Array is not 2-dimensional.
-            IndexError: If the column index is out of bounds
-            ValueError: If shape of new column is not matched with the Array shape
-        """
-        if self.ndim != 2:
-            raise ValueError("set_col method only supports 2D arrays")
-        if index < 0 or index >= self.shape[1]:
-            raise IndexError("Column index out of range")
-        if col.shape[0] != self.shape[0]:
-            raise ValueError("Column array has incompatible shape")
-        
-        for i in range(self.shape[0]):
-            self.data[i][index] = col.data[i][0]
     
     @property
     def T(self):
@@ -473,7 +482,7 @@ class Array:
             row = []
             for j in range(cols_B):
                 sum_product = 0
-                for k in range(cols_A):
+                for k in range(rows_B):
                     sum_product += A[i][k] * B[k][j]
                 row.append(sum_product)
             result_data.append(row)
@@ -518,130 +527,196 @@ class Array:
         result_data, _ = build_nested_list(result_flat,self.shape)
         return Array(result_data)
     
-    def exp(self)-> Array:
+    def exp(self,cols = None, rows = None)-> Array:
         """Compute the element-wise exponential of the Array.
 
         Returns:
             Array: A new Array whose elements are the exponential of the corresponding elements of self.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            data = self
+        elif cols is not None and rows is None:
+            data = self.get_col(cols)
+        elif cols is None and rows is not None:
+            data = self.get_row(rows)
+        
+        self_flat = data.flatten()
         
         result_flat = [math.exp(a) for a in self_flat]
-        result_data, _ = build_nested_list(result_flat,self.shape)
+        result_data, _ = build_nested_list(result_flat,data.shape)
         return Array(result_data)
     
-    def log(self)-> Array:
+    def log(self, cols = None, rows = None)-> Array:
         """Compute the element-wise natural logarithm of the Array.
 
         Returns:
             _type_: A new Array whose elements are the natural logarithm of the corresponding elements of self.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            data = self
+        elif cols is not None and rows is None:
+            data = self.get_col(cols)
+        elif cols is None and rows is not None:
+            data = self.get_row(rows)
+        
+        self_flat = data.flatten()
         
         result_flat = [math.log(a) for a in self_flat]
-        result_data, _ = build_nested_list(result_flat,self.shape)
+        result_data, _ = build_nested_list(result_flat,data.shape)
         return Array(result_data)
     
-    def abs(self)-> Array:
+    def abs(self, cols = None, rows = None)-> Array:
         """Compute the element-wise absolute value of the Array.
 
         Returns:
             Array: A new Array whose elements are the absolute values of the corresponding elements of self.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            data = self
+        elif cols is not None and rows is None:
+            data = self.get_col(cols)
+        elif cols is None and rows is not None:
+            data = self.get_row(rows)
         
-        result_flat = [math.abs(a) for a in self_flat]
-        result_data, _ = build_nested_list(result_flat,self.shape)
+        self_flat = data.flatten()
+        
+        result_flat = [abs(a) for a in self_flat]
+        result_data, _ = build_nested_list(result_flat,data.shape)
         return Array(result_data)
     
-    def sqrt(self)-> Array:
+    def sqrt(self, cols = None, rows = None)-> Array:
         """Compute the element-wise square root of the Array.
 
         Returns:
             Array: A new Array whose elements are the square roots of the corresponding elements of self.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            data = self
+        elif cols is not None and rows is None:
+            data = self.get_col(cols)
+        elif cols is None and rows is not None:
+            data = self.get_row(rows)
         
+        self_flat = data.flatten()
         result_flat = [math.sqrt(a) for a in self_flat]
-        result_data, _ = build_nested_list(result_flat,self.shape)
+        result_data, _ = build_nested_list(result_flat,data.shape)
         return Array(result_data)
     
-    def sum(self)-> float:
+    def sum(self, cols = None, rows = None)-> float:
         """Compute the sum of all elements in the Array.
 
         Returns:
             float: The sum of all elements.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            self_flat = self.flatten()
+        elif cols is not None and rows is None:
+            self_flat = self.get_col(cols).flatten()
+        elif cols is None and rows is not None:
+            self_flat = self.get_row(rows).flatten()
+        
         sum = 0
         for i in range(len(self_flat)):
             sum += self_flat[i]
         return float(sum)
     
-    def mean(self)-> float:
+    def mean(self, cols = None, rows = None)-> float:
         """Compute the mean (average) of all elements in the Array.
 
         Returns:
             float: The mean of all elements.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            self_flat = self.flatten()
+        elif cols is not None and rows is None:
+            self_flat = self.get_col(cols).flatten()
+        elif cols is None and rows is not None:
+            self_flat = self.get_row(rows).flatten()
+        
         return float(sum(self_flat) / len(self_flat))
     
-    def max(self)-> float:
+    def max(self, cols = None, rows = None)-> float:
         """Compute the maximum value among all elements in the Array.
 
         Returns:
             float: The maximum value.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            self_flat = self.flatten()
+        elif cols is not None and rows is None:
+            self_flat = self.get_col(cols).flatten()
+        elif cols is None and rows is not None:
+            self_flat = self.get_row(rows).flatten()
+            
         max = self_flat[0] 
         for i in range(1, len(self_flat)):
             if self_flat[i] > max:
                 max = self_flat[i]
         return float(max)
     
-    def min(self)-> float:
+    def min(self, cols = None, rows = None)-> float:
         """Compute the minimum value among all elements in the Array.
 
         Returns:
             float: The minimum value.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            self_flat = self.flatten()
+        elif cols is not None and rows is None:
+            self_flat = self.get_col(cols).flatten()
+        elif cols is None and rows is not None:
+            self_flat = self.get_row(rows).flatten()
+            
         min = self_flat[0] 
         for i in range(1, len(self_flat)):
             if self_flat[i] < min:
                 min = self_flat[i]
         return float(min)
 
-    def arg_min(self)-> tuple:
+    def arg_min(self, cols = None, rows = None)-> tuple:
         """Find the indices of the minimum value in the Array.
 
         Returns:
             tuple: The indices of the minimum value as a tuple.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            data = self
+        elif cols is not None and rows is None:
+            data = self.get_col(cols)
+        elif cols is None and rows is not None:
+            data = self.get_row(rows)
+            
+        self_flat = data.flatten()
         a = min(self_flat)
         for i in range(len(self_flat)):
             if self_flat[i] == a:
-                return index_to_coord(i,self.shape)
+                return index_to_coord(i,data.shape)
             
-    def arg_max(self)-> tuple:
+    def arg_max(self, cols = None, rows = None)-> tuple:
         """Find the indices of the maximum value in the Array.
 
         Returns:
             tuple: The indices of the maximum value as a tuple.
         """
-        self_flat = self.flatten()
+        if cols is None and rows is None:
+            data = self
+        elif cols is not None and rows is None:
+            data = self.get_col(cols)
+        elif cols is None and rows is not None:
+            data = self.get_row(rows)
+            
+        self_flat = data.flatten()
         a = max(self_flat)
         for i in range(len(self_flat)):
             if self_flat[i] == a:
-                return  index_to_coord(i,self.shape)
+                return  index_to_coord(i,data.shape)
     
     #TODO: calculate P - permutation matrix
     def LU_Decomposition(self):
-        """Perform LU Decomposition of a square Array using Doolittle's method.
-            Idea: A = LU
-            where L is lower triangular matrix with unit diagonal elements
+        """Perform LU Decomposition of a square Array.
+            Idea: PA = LU
+            where P is permutation matrix
+            L is lower triangular matrix with unit diagonal elements
             and U is upper triangular matrix.
 
         Raises:
@@ -654,27 +729,44 @@ class Array:
         """
         if self._LU is not None:
             return self._LU
-        
         n = self.shape[0]
-        if n != self.shape[1]:
-            raise ValueError("LU decomposition requires a square matrix")
-
-        L = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+        
         U = self.copy()
-
-        for p in range (n-1):
-            pivot = U.data[p][p]
-            if pivot == 0:
+        swap_count = 0
+        L = eye(n)
+        P = eye(n)
+        
+        for p in range(n):
+            pivot_row = p 
+            max_val = abs(U.data[p][p])
+            for i in range (p+1, n):
+                if abs(U.data[i][p]) > max_val:
+                    max_val = abs(U.data[i][p])
+                    pivot_row = i
+                    
+            if U.data[pivot_row][p] == 0:
                 raise ValueError("Zero pivot encountered — pivoting required")
 
-            for i in range(p+1, n):
-                w = U.data[i][p]/pivot
-                L[i][p] = w
+            if pivot_row != p:
+                U.data[pivot_row], U.data[p] = U.data[p],U.data[pivot_row]
+                P.data[pivot_row], P.data[p] = P.data[p],P.data[pivot_row]
+                swap_count ^= 1
                 
-                for j in range (p, n):
+                if p>0:
+                    L.data[p][:p], L.data[pivot_row][:p] =  L.data[pivot_row][:p], L.data[p][:p]
+            
+            pivot = U.data[p][p]         
+            
+            for i in range(p+1,n):
+                w = U.data[i][p]/pivot
+                L.data[i][p] = w
+                
+                for j in range(p,n):
                     U.data[i][j] -= w*U.data[p][j]
-        self._LU = (L, U)
-        return Array(L), U   
+                    
+        self._swap_count = swap_count
+        self._LU = (P, L, U)
+        return P, L, U   
     
     def determinant(self)-> float:
         """Compute the determinant of a square Array using its LU Decomposition.
@@ -685,10 +777,16 @@ class Array:
         if self._det is not None:
             return self._det
         
-        L, U = self.LU_Decomposition()
+        try:
+            P, L, U = self.LU_Decomposition()
+        except ValueError:
+            # LU failed → matrix is singular
+            self._det = 0.0
+            return 0.0
+        
         det = 1
         for i in range(self.shape[0]):
             det*= U.data[i][i]
         
-        self._det = det
-        return det 
+        self._det = (-1) **self._swap_count * det
+        return (-1) **self._swap_count * det

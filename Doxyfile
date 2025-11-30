@@ -42,7 +42,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "MiniNumPy"
+PROJECT_NAME           = "My Project"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -68,7 +68,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = docs
+OUTPUT_DIRECTORY       =
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create up to 4096
 # sub-directories (in 2 levels) under the output directory of each output format
@@ -342,7 +342,7 @@ OPTIMIZE_OUTPUT_SLICE  = NO
 #
 # Note see also the list of default file extension mappings.
 
-EXTENSION_MAPPING      =    py=Python
+EXTENSION_MAPPING      =
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -518,7 +518,7 @@ TIMESTAMP              = NO
 # normally produced when WARNINGS is set to YES.
 # The default value is: NO.
 
-EXTRACT_ALL            = YES
+EXTRACT_ALL            = NO
 
 # If the EXTRACT_PRIVATE tag is set to YES, all private members of a class will
 # be included in the documentation.
@@ -943,7 +943,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = MiniNumPy
+INPUT                  = /home/hung-nguyen/MiniNumPy/MiniNumPy
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1136,7 +1136,7 @@ INPUT_FILTER           =
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-FILTER_PATTERNS        =    *.py=doxypypy -a -c
+FILTER_PATTERNS        =
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will also be used to filter the input files that are used for
