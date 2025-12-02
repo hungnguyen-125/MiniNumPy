@@ -1,0 +1,7 @@
+MiniNumPy
+=========
+
+.. toctree::
+   :maxdepth: 4
+
+   MiniNumPy

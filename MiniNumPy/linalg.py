@@ -39,7 +39,7 @@ def matmul(A: Array, B: Array)-> Array:
     Returns:
         Array: The result of the matrix multiplication with broadcasting applied.
     """
-    # ---------- STEP 1: Check last dims ----------
+    # Compatible checking
     if A.shape[-1] != B.shape[-2]:
         raise ValueError("matmul: last dims mismatch")
 
@@ -47,7 +47,7 @@ def matmul(A: Array, B: Array)-> Array:
     k = A.shape[-1]
     n = B.shape[-1]
 
-    # ---------- STEP 2: Broadcast batch dims ----------
+    #Boardcast batch shape (take all dim except the last 2)
     batchA = A.shape[:-2]
     batchB = B.shape[:-2]
 
@@ -55,21 +55,14 @@ def matmul(A: Array, B: Array)-> Array:
     if batch_shape is None:
         raise ValueError("Cannot broadcast batch dims")
 
-    # ---------- STEP 3: Final output shape ----------
+    #build the final shape
     out_shape = batch_shape + (m, n)
 
-    # flatten arrays
     flatA = A.flatten()
     flatB = B.flatten()
+    out_flat = [0] * prod(out_shape)
 
-    # result buffer
-    out_flat = [0] * (prod(out_shape))
-
-    # pre-calc shapes for mapping
-    Ashape = A.shape
-    Bshape = B.shape
-
-    # ---------- STEP 4: For each output index, compute C[coord] ----------
+    # For each output index, compute C[coord]
     for c_index in range(len(out_flat)):
 
         # coordinate of output element
@@ -79,10 +72,11 @@ def matmul(A: Array, B: Array)-> Array:
         batch = coordC[:-2]
         i = coordC[-2]
         j = coordC[-1]
-
+        
+        # From C find the A coord and Bcoord that construct C
         # map batch index to A index
         idxA = []
-        off = len(batch_shape) - len(batchA)
+        off = len(batch_shape) - len(batchA) # off = 0 => A dim = out dim 
         for t in range(len(batchA)):
             dimA = batchA[t]
             dimOut = batch_shape[t + off]
@@ -105,20 +99,20 @@ def matmul(A: Array, B: Array)-> Array:
         # full coords for A and B inside batch
         # A: (...batch..., i, k)
         # B: (...batch..., k, j)
-        acc = 0
+        rel = 0
         for kk in range(k):
             coordA = tuple(idxA + [i, kk])
             coordB = tuple(idxB + [kk, j])
 
-            Ai = flatA[coord_to_index(coordA, Ashape)]
-            Bj = flatB[coord_to_index(coordB, Bshape)]
+            Ai = flatA[coord_to_index(coordA, A.shape)]
+            Bj = flatB[coord_to_index(coordB, B.shape)]
 
-            acc += Ai * Bj
+            rel += Ai * Bj
 
-        out_flat[c_index] = acc
+        out_flat[c_index] = rel
 
-    # ---------- STEP 5: Build nested result ----------
     nested, _ = build_nested_list(out_flat, out_shape)
+    # Total complexity: O(size)
     return Array(nested)
 
 def broadcast_shapes(shapeA: tuple, shapeB: tuple)-> tuple:
@@ -131,10 +125,11 @@ def broadcast_shapes(shapeA: tuple, shapeB: tuple)-> tuple:
     Returns:
         tuple: The broadcasted shape, or None if they cannot be broadcast together.
     """
+    # Check from right to left (from the closest level with last 2 dim to the most furthur)
     a = list(shapeA)[::-1]
     b = list(shapeB)[::-1]
     out = []
-    
+    # build the boardcasting shape
     for i in range (max(len(a),len(b))):
         dimA = a[i] if i < len(a) else 1
         dimB = b[i] if i < len(b) else 1
@@ -202,6 +197,12 @@ def norm(a:Array, ord = None)->float:
             cols_sum.append(s)
         return float(max(cols_sum))
     
+    # Max sigma (sqrt of eigein value of ATA)
+    if ord ==2:
+        ATA = a.T@a
+        eigenvalue,_ = eig(ATA)
+        return eigenvalue.max()**0.5
+    
     # Max row sum 
     if ord == 3:
         rows_sum = []
@@ -212,11 +213,6 @@ def norm(a:Array, ord = None)->float:
                 s+= abs(rows.data[j])
             rows_sum.append(s)
         return float(max(rows_sum))
-
-    if ord ==2:
-        ATA = a.T@a
-        eigenvalue,_ = eig(ATA)
-        return eigenvalue.max()**0.5
     
 def det(a:Array):
     return a.determinant()
@@ -224,14 +220,14 @@ def det(a:Array):
 def solve(A: Array, B: Array) -> Array:
     """
     Solve the linear system A X = B where:
-      - A is an n×n square matrix
+      - A is an nxn square matrix
       - B is either:
             (n,)   → 1-D vector
             (n,1)  → column vector
             (n,k)  → multiple right-hand sides
 
     Returns:
-      - X with the same second dimension as B (n×1 or n×k)
+      - X with the same second dimension as B (nx1 or nxk)
     """
 
     # A must be an n×n square matrix
@@ -240,12 +236,14 @@ def solve(A: Array, B: Array) -> Array:
 
     n = A.shape[0]
     
-     # Compute LU decomposition of A
-    P, L, U = A.LU_Decomposition()
+    try:
+            P, L, U = A.LU_Decomposition()
+    except ValueError:
+       return "System has infinitely many solutions or no solution"
     
     # Convert B into a proper 2-D matrix form (column vectors)
     if B.ndim == 1:
-        # Convert shape (n,) → (n,1)
+        # Convert shape (n,) -> (n,1)
         Bmat = Array([[B.data[i]] for i in range(n)])
     elif B.ndim == 2 and B.shape[0] == n:
         # Already (n,1) or (n,k)
@@ -328,7 +326,8 @@ def inv(a:Array)->Array:
 #TODO: Eigenvalue using QRD
 
 def qr_decomposition(A: Array):
-    """ Calculate the QR decomposition of matrix A using the Gram-Schmidt process.
+    """
+    Calculate the QR decomposition of matrix A using the Gram-Schmidt process.
         Idea: A = Q R
         where:
             Q: orthogonal matrix (columns are orthonormal vectors)
@@ -351,7 +350,7 @@ def qr_decomposition(A: Array):
 
         for i in range(j):
             qi = Q.get_col(i) # m x 1
-            R.data[i][j] = dot(qi,v) 
+            R.data[i][j] = dot(qi,v) # v = aj 
             v = v - qi * R.data[i][j]
 
         norm_v = norm(v)
@@ -386,7 +385,7 @@ def eig(B:Array, max_iter=200, eps=1e-6):
     # eigenvector accumulator
     V = identity(n)
 
-    for k in range(max_iter):
+    for _ in range(max_iter):
         Q, R = qr_decomposition(A)
 
         A = R @ Q      # QR iteration
@@ -408,14 +407,12 @@ def eig(B:Array, max_iter=200, eps=1e-6):
     # eigenvalues = diagonal
     eigenvalues = [A.data[i][i] for i in range(n)]
     
-    # eigenvectors = []
+    eigenvectors = []
 
     # for lam in eigenvalues:
-    #     # (A - λI)
     #     M = B - identity(n)*lam
-    #     v = solve(M, zeros((n,1)))
-    #     eigenvectors.append(v.flatten())
+    #     v = nullspace(M)
+    #     eigenvectors.append(v.data)
     
-    # # pack columns
-    # V_final = Array(eigenvectors).transpose()
-    return Array(eigenvalues), V
+    return Array(eigenvalues), Array(eigenvectors)
+

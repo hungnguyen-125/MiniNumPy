@@ -1,0 +1,1010 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiniNumPy.Array &mdash; Mininumpy 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Mininumpy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">MiniNumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Mininumpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">MiniNumPy.Array</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for MiniNumPy.Array</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<div class="viewcode-block" id="build_nested_list">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.build_nested_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_nested_list</span><span class="p">(</span><span class="n">flat_data</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a nested list from a flat list based on the given shape.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        flat_data (list): A flat list containing the data elements.</span>
+<span class="sd">        shape (tuple): The desired shape of the nested list.</span>
+<span class="sd">        offset (int, optional): Work as a pointer point to the data will take in next loop (tracking pointer). This is used</span>
+<span class="sd">        internally during recursion. Defaults to 0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        nested_list: A nested list structured according to the specified shape.</span>
+<span class="sd">        offset: The updated offset after building the nested list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If shape empty → return a single element</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">flat_data</span><span class="p">[</span><span class="n">offset</span><span class="p">],</span> <span class="n">offset</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># allocate this level</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sub_shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">nested_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># recursively fill</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">):</span>
+        <span class="n">item</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">flat_data</span><span class="p">,</span> <span class="n">sub_shape</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
+        <span class="n">nested_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nested_list</span><span class="p">,</span> <span class="n">offset</span></div>
+
+    
+<div class="viewcode-block" id="array">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.array">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+    
+<span class="k">def</span><span class="w"> </span><span class="nf">_fill</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to create a nested list filled with a specific value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        shape (tuple): The shape of the nested list to create.</span>
+<span class="sd">        fill_value (float): The value to fill the nested list with.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: The nested list filled with the specified value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">fill_value</span><span class="p">]</span><span class="o">*</span><span class="n">size</span>
+    <span class="n">filled_arr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">flat</span><span class="p">,</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filled_arr</span>
+
+<div class="viewcode-block" id="zeros">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.zeros">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an Array filled with zeros.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        shape (tuple): Shape of the Array</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array: An Array of the specified shape filled with zeros.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">_fill</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ones">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.ones">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an Array filled with ones.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        shape (tuple): Shape of the Array</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array: An Array of the specified shape filled with ones.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">_fill</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="identity">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.identity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">identity</span><span class="p">(</span><span class="n">n</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an identity matrix of size n x n.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n (int): Size of the identity matrix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array: An n x n identity matrix as an Array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">_fill</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="eye">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.eye">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">eye</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a 2D Array with ones on a specified diagonal and zeros elsewhere.</span>
+<span class="sd">        - If offset = 0 =&gt; main diagonal.</span>
+<span class="sd">        - If offset &gt; 0 =&gt; diagonal shifted to the right &quot;offset&quot; columns.</span>
+<span class="sd">        - If offset &lt; 0 =&gt; diagonal shifted downward &quot;offset&quot; rows.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        n (int): Number of rows.</span>
+<span class="sd">        m (int, optional): Number of column. Defaults to None.</span>
+<span class="sd">        offset (int, optional): Index of the diagonal. Defaults to 0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array: A 2D Array with ones on the specified diagonal and zeros elsewhere.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="n">m</span> <span class="o">=</span> <span class="n">n</span>
+        
+    <span class="n">data</span> <span class="o">=</span> <span class="n">_fill</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">offset</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="arange">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.arange">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">arange</span><span class="p">(</span><span class="n">start</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a 1D Array with evenly spaced values within a given interval.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        start (float): Start of the interval.</span>
+<span class="sd">        stop (float, optional): End of the interval. Defaults to None.</span>
+<span class="sd">        step (float, optional): The spacing between values. Defaults to 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array: A 1D Array containing evenly spaced values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">step</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">stop</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">step</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">+=</span> <span class="n">step</span>
+    <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="linspace">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.linspace">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">linspace</span><span class="p">(</span><span class="n">start</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a 1D Array with evenly spaced values over a specified interval.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        start (float): Start of the interval.</span>
+<span class="sd">        stop (float): End of the interval.</span>
+<span class="sd">        num (int, optional): Number of elements . Defaults to 50.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array: A 1D Array containing num evenly spaced values from start to stop.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">([])</span>
+    <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">([</span><span class="n">start</span><span class="p">])</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">step</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="index_to_coord">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.index_to_coord">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">index_to_coord</span><span class="p">(</span><span class="n">index</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a flat index to multi-dimensional coordinates based on the given shape.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        index (int): The flat index to convert.</span>
+<span class="sd">        shape (tuple): The shape of the multi-dimensional array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: The multi-dimensional coordinates corresponding to the flat index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coord</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+        <span class="n">coord</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="o">%</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">//=</span> <span class="n">i</span>
+    <span class="n">coord</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="coord_to_index">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.coord_to_index">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">coord_to_index</span><span class="p">(</span><span class="n">coord</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert multi-dimensional coordinates to a flat index based on the given shape.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coord (tuple): The multi-dimensional coordinates to convert.</span>
+<span class="sd">        shape (tuple): The shape of the multi-dimensional array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The flat index corresponding to the multi-dimensional coordinates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">coord</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prod">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.prod">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">*=</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="Array">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Array</span><span class="p">:</span>
+<div class="viewcode-block" id="Array.__init__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_shape</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_swap_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_LU</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_det</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get shape of data using recursive function</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (list, nested listed or scalar): </span>
+<span class="sd">                A nested list representing an n-dimensional array. Scalar is the input of the deepest level</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            shape (tuple): Shape of the nested list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_shape</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">()</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the total number of elements in an Array from its shape.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            shape(tuple): Array&#39;s shape</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            size(int): Total number of element in an Array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Array.get_col">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.get_col">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a column of the 2D Array as a new Array.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): The index of the column to extract</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the Array is not 2-dimensional.</span>
+<span class="sd">            IndexError: If the column index is out of bounds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;get_col method only supports 2D arrays&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Column index out of range&quot;</span><span class="p">)</span>
+        
+        <span class="n">col_data</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">index</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">col_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.set_col">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.set_col">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">Array</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Replace a column of the 2D Array with the values from another Array.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): The column index to replace.</span>
+<span class="sd">            col (Array): A column vector (n,1) whose values will overwrite the</span>
+<span class="sd">                        specified column of the current Array. </span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the Array is not 2-dimensional.</span>
+<span class="sd">            IndexError: If the column index is out of bounds</span>
+<span class="sd">            ValueError: If shape of new column is not matched with the Array shape</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;set_col method only supports 2D arrays&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Column index out of range&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Column array has incompatible shape&quot;</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+
+            
+<div class="viewcode-block" id="Array.get_row">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.get_row">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;get_row method only supports 2D arrays&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Row index out of range&quot;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="Array.flatten">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.flatten">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flatten</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Flatten an n-dimensional Array into a 1D Python list.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Flattened Array (list): List A 1D Python list containing all scalar elements of the array,</span>
+<span class="sd">            in row-major order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">flattened_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_flat</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+                    <span class="n">flattened_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_flat</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">_flat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">flattened_array</span></div>
+
+
+
+<div class="viewcode-block" id="Array.reshape">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.reshape">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Return a new Array with the same data but a different shape.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_shape (tuple): The desired shape of the output array</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the total number of elements implied by `new_shape` does not</span>
+<span class="sd">                        match the size of the original array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            new Array (Array): A new Array instance whose data is the same as the original,</span>
+<span class="sd">                                but arranged according to `new_shape`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if the new shape is compatible with the current size</span>
+        <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_size</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_size</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot reshape array of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2"> into shape </span><span class="si">{</span><span class="n">new_shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># flatten the data</span>
+        <span class="n">flat_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="n">new_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">flat_data</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span></div>
+
+    
+    <span class="c1"># TODO: understand this function</span>
+<div class="viewcode-block" id="Array.__str__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__str__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return a formatted string representation of the Array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">format_array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">arr</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">/</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">part</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">step</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">step</span><span class="p">]</span>
+                    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_array</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">newlines</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">newline</span> <span class="o">=</span> <span class="n">newlines</span> <span class="o">+</span> <span class="n">indent</span>
+                <span class="k">return</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="n">newline</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+        
+        <span class="k">return</span> <span class="n">format_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.copy">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.copy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a deep copy the Array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span></div>
+
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Array.transpose">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.transpose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Permute the axes of the Array and return a new transposed Array.</span>
+<span class="sd">            The operation constructs a new Array by:</span>
+<span class="sd">                1. Flattening the original data,</span>
+<span class="sd">                2. Mapping each element&#39;s coordinate under the new axis order,</span>
+<span class="sd">                3. Reshaping the permuted flat list into the new shape.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            axes (tuple, optional): Desired ordering of axes. Defaults to None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the length of axes does not match the Array.ndim</span>
+<span class="sd">            ValueError: If the axes does not contain interger from 0 to Array.ndim -1</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array with its axes permuted according to `axes`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">old_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        
+        <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">axes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Axes don&#39;t match array&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid axes for transpose&quot;</span><span class="p">)</span>
+        
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">old_shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">)</span>
+        
+        <span class="n">flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">new_flat</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">old_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flat</span><span class="p">)):</span>
+            <span class="n">old_coord</span> <span class="o">=</span> <span class="n">index_to_coord</span><span class="p">(</span><span class="n">old_index</span><span class="p">,</span> <span class="n">old_shape</span><span class="p">)</span>
+            <span class="n">new_coord</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">old_coord</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">)</span>
+            <span class="n">new_index</span> <span class="o">=</span> <span class="n">coord_to_index</span><span class="p">(</span><span class="n">new_coord</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">)</span>
+            <span class="n">new_flat</span><span class="p">[</span><span class="n">new_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">flat</span><span class="p">[</span><span class="n">old_index</span><span class="p">]</span>
+
+        <span class="n">new_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">new_flat</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span></div>
+
+    
+    <span class="c1">################################################Elementwise Operations#####################################################</span>
+<div class="viewcode-block" id="Array.__add__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__add__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Array</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="n">Array</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Element-wise addition of two Arrays</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Array): First Array</span>
+<span class="sd">            other (Array): Second Array</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the two Arrays do not have the same size.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the sum of the corresponding elements of self and other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">other_flat</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_flat</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Arrays must have the same size for addition&quot;</span><span class="p">)</span>
+        
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">self_flat</span><span class="p">,</span> <span class="n">other_flat</span><span class="p">)]</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.__mul__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__mul__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Array</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Element-wise multiplication of an Array by a scalar.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Array): The Array to be scaled.</span>
+<span class="sd">            other (float): The scalar multiplier.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the elements of self multiplied by other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="c1"># O(n)</span>
+        
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">*</span> <span class="n">other</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">self_flat</span><span class="p">]</span> <span class="c1"># O(n)</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># O(n)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.__sub__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__sub__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Array</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="n">Array</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Element-wise subtraction of two Arrays.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Array): The minuend Array.</span>
+<span class="sd">            other (Array): The subtrahend Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the difference between the corresponding elements of self and other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="p">(</span><span class="n">other</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.__matmul__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__matmul__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Array</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="n">Array</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Matrix multiplication of two Arrays. 2D Arrays or 1D Arrays are supported.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Array): First Array</span>
+<span class="sd">            other (Array): Second Array</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the inner dimensions do not match for matrix multiplication.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array resulting from the matrix multiplication of self and other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="n">A</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="p">[[</span><span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">B</span><span class="p">]</span>
+        
+        <span class="n">cols_A</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">cols_B</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">rows_A</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">rows_B</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">cols_A</span> <span class="o">!=</span> <span class="n">rows_B</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Inner dimensions must match for matrix multiplication&quot;</span><span class="p">)</span>
+        
+        <span class="n">result_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows_A</span><span class="p">):</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols_B</span><span class="p">):</span>
+                <span class="n">sum_product</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows_B</span><span class="p">):</span>
+                    <span class="n">sum_product</span> <span class="o">+=</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">B</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_product</span><span class="p">)</span>
+            <span class="n">result_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result_data</span><span class="p">])</span>
+        
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.__truediv__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__truediv__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Array</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Element-wise division of an Array by a scalar.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Array): The Array to be divided.</span>
+<span class="sd">            other (float): The scalar divisor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the elements of self divided by other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">/</span> <span class="n">other</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">self_flat</span><span class="p">]</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.__pow__">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.__pow__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Array</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Element-wise exponentiation of an Array by a scalar.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Array): The base Array.</span>
+<span class="sd">            other (float): The exponent.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the elements of self raised to the power of other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">**</span> <span class="n">other</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">self_flat</span><span class="p">]</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.exp">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.exp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the element-wise exponential of the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the exponential of the corresponding elements of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">self_flat</span><span class="p">]</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.log">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.log">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the element-wise natural logarithm of the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _type_: A new Array whose elements are the natural logarithm of the corresponding elements of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">self_flat</span><span class="p">]</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.abs">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.abs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">abs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the element-wise absolute value of the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the absolute values of the corresponding elements of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">self_flat</span><span class="p">]</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.sqrt">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.sqrt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the element-wise square root of the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array: A new Array whose elements are the square roots of the corresponding elements of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">result_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">self_flat</span><span class="p">]</span>
+        <span class="n">result_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_nested_list</span><span class="p">(</span><span class="n">result_flat</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.sum">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.sum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the sum of all elements in the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The sum of all elements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)):</span>
+            <span class="nb">sum</span> <span class="o">+=</span> <span class="n">self_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.mean">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.mean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the mean (average) of all elements in the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The mean of all elements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">self_flat</span><span class="p">))</span></div>
+
+    
+<div class="viewcode-block" id="Array.max">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.max">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the maximum value among all elements in the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The maximum value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            
+        <span class="nb">max</span> <span class="o">=</span> <span class="n">self_flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">self_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">:</span>
+                <span class="nb">max</span> <span class="o">=</span> <span class="n">self_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Array.min">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.min">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the minimum value among all elements in the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The minimum value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            
+        <span class="nb">min</span> <span class="o">=</span> <span class="n">self_flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">self_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">:</span>
+                <span class="nb">min</span> <span class="o">=</span> <span class="n">self_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Array.arg_min">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.arg_min">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the indices of the minimum value in the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: The indices of the minimum value as a tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+            
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">self_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">a</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">index_to_coord</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
+
+            
+<div class="viewcode-block" id="Array.arg_max">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.arg_max">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the indices of the maximum value in the Array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: The indices of the maximum value as a tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_row</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+            
+        <span class="n">self_flat</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">self_flat</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">self_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">a</span><span class="p">:</span>
+                <span class="k">return</span>  <span class="n">index_to_coord</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
+
+    
+    <span class="c1">#TODO: calculate P - permutation matrix</span>
+<div class="viewcode-block" id="Array.LU_Decomposition">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.LU_Decomposition">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">LU_Decomposition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform LU Decomposition of a square Array.</span>
+<span class="sd">            Idea: PA = LU</span>
+<span class="sd">            where P is permutation matrix</span>
+<span class="sd">            L is lower triangular matrix with unit diagonal elements</span>
+<span class="sd">            and U is upper triangular matrix.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the Array is not square.</span>
+<span class="sd">            ValueError: If a zero pivot is encountered (no pivoting implemented).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            L (Array): Lower triangular matrix with unit diagonal elements.</span>
+<span class="sd">            U (Array): Upper triangular matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LU</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LU</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">swap_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">pivot_row</span> <span class="o">=</span> <span class="n">p</span> 
+            <span class="n">max_val</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="n">p</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">p</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">max_val</span><span class="p">:</span>
+                    <span class="n">max_val</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">p</span><span class="p">])</span>
+                    <span class="n">pivot_row</span> <span class="o">=</span> <span class="n">i</span>
+                    
+            <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pivot_row</span><span class="p">][</span><span class="n">p</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Zero pivot encountered — pivoting required&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">pivot_row</span> <span class="o">!=</span> <span class="n">p</span><span class="p">:</span>
+                <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pivot_row</span><span class="p">],</span> <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">],</span><span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pivot_row</span><span class="p">]</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pivot_row</span><span class="p">],</span> <span class="n">P</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">],</span><span class="n">P</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pivot_row</span><span class="p">]</span>
+                <span class="n">swap_count</span> <span class="o">^=</span> <span class="mi">1</span>
+                
+                <span class="k">if</span> <span class="n">p</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">L</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">][:</span><span class="n">p</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pivot_row</span><span class="p">][:</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span>  <span class="n">L</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pivot_row</span><span class="p">][:</span><span class="n">p</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">][:</span><span class="n">p</span><span class="p">]</span>
+            
+            <span class="n">pivot</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="n">p</span><span class="p">]</span>         
+            
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">p</span><span class="p">]</span><span class="o">/</span><span class="n">pivot</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span>
+                
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+                    <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">w</span><span class="o">*</span><span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                    
+        <span class="bp">self</span><span class="o">.</span><span class="n">_swap_count</span> <span class="o">=</span> <span class="n">swap_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_LU</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">P</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span>   </div>
+
+    
+<div class="viewcode-block" id="Array.determinant">
+<a class="viewcode-back" href="../../MiniNumPy.html#MiniNumPy.Array.Array.determinant">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">determinant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the determinant of a square Array using its LU Decomposition.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The determinant of the Array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_det</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_det</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">P</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LU_Decomposition</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># LU failed → matrix is singular</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_det</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        
+        <span class="n">det</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">det</span><span class="o">*=</span> <span class="n">U</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_det</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_swap_count</span> <span class="o">*</span> <span class="n">det</span>
+        <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_swap_count</span> <span class="o">*</span> <span class="n">det</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Long Quang NGUYEN.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

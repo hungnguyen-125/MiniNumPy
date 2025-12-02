@@ -1,0 +1,29 @@
+MiniNumPy package
+=================
+
+Submodules
+----------
+
+MiniNumPy.Array module
+----------------------
+
+.. automodule:: MiniNumPy.Array
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+MiniNumPy.linalg module
+-----------------------
+
+.. automodule:: MiniNumPy.linalg
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: MiniNumPy
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -15,7 +15,7 @@ def build_nested_list(flat_data:list, shape:tuple, offset=0):
         offset: The updated offset after building the nested list.
     """
 
-    # If shape empty → return a single element
+    # If shape empty => return a single element
     if len(shape) == 0:
         return flat_data[offset], offset + 1
 
@@ -30,6 +30,7 @@ def build_nested_list(flat_data:list, shape:tuple, offset=0):
         nested_list.append(item)
 
     return nested_list, offset
+        
     
 def array(data):
     return Array(data)
@@ -162,9 +163,9 @@ def index_to_coord(index:int,shape:tuple)-> tuple:
     """
     coord = []
     
-    for i in reversed(shape):
-        coord.append(index%i)
-        index //= i
+    for s in reversed(shape):
+        coord.append(index%s)
+        index //= s
     coord.reverse()
     return tuple(coord)
 
@@ -199,11 +200,13 @@ class Array:
         
         self.size = self._get_size(self.shape)
         
-        self._swap_count = 0
-
         self._LU = None
         
         self._det = None
+        
+        self._swap_count = 0
+
+       
 
 
     def _get_shape(self, data)-> tuple:
@@ -347,7 +350,7 @@ class Array:
         return format_array(self.flatten(), self.shape)
     
     def copy(self):
-        """Return a deep copy the Array
+        """Return a deep copy of an 2-D Array
         """
         new_data = [row[:] for row in self.data]
         return Array(new_data)
@@ -418,6 +421,7 @@ class Array:
         
         result_flat = [a + b for a, b in zip(self_flat, other_flat)]
         result_data, _ = build_nested_list(result_flat, self.shape)
+        # Total complexity =: O(size)
         return Array(result_data)
     
     def __mul__(self:Array, other:float)-> Array:
@@ -430,10 +434,10 @@ class Array:
         Returns:
             Array: A new Array whose elements are the elements of self multiplied by other.
         """
-        self_flat = self.flatten() # O(n)
+        self_flat = self.flatten() # O(size)
         
-        result_flat = [a * other for a in self_flat] # O(n)
-        result_data, _ = build_nested_list(result_flat, self.shape) # O(n)
+        result_flat = [a * other for a in self_flat] # O(size)
+        result_data, _ = build_nested_list(result_flat, self.shape) # O(size)
         return Array(result_data)
     
     def __sub__(self:Array, other:Array)-> Array:
@@ -447,6 +451,40 @@ class Array:
             Array: A new Array whose elements are the difference between the corresponding elements of self and other.
         """
         return self + (other * -1)
+    
+    def __truediv__(self:Array, other:float)-> Array:
+        """Element-wise division of an Array by a scalar.
+
+        Args:
+            self (Array): The Array to be divided.
+            other (float): The scalar divisor.
+
+        Returns:
+            Array: A new Array whose elements are the elements of self divided by other.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [a / other for a in self_flat]
+        result_data, _ = build_nested_list(result_flat, self.shape)
+        # Total complexity: O(sizes)
+        return Array(result_data)
+    
+    def __pow__(self:Array, other:float)-> Array:
+        """Element-wise exponentiation of an Array by a scalar.
+
+        Args:
+            self (Array): The base Array.
+            other (float): The exponent.
+
+        Returns:
+            Array: A new Array whose elements are the elements of self raised to the power of other.
+        """
+        self_flat = self.flatten()
+        
+        result_flat = [a ** other for a in self_flat]
+        result_data, _ = build_nested_list(result_flat,self.shape)
+        # Total complexity: O(sizes)
+        return Array(result_data)
     
     def __matmul__(self:Array, other:Array)-> Array:
         """ Matrix multiplication of two Arrays. 2D Arrays or 1D Arrays are supported.
@@ -492,39 +530,7 @@ class Array:
         
         if other.ndim ==1:
             return Array([x[0] for x in result_data])
-        
-        return Array(result_data)
-    
-    def __truediv__(self:Array, other:float)-> Array:
-        """Element-wise division of an Array by a scalar.
-
-        Args:
-            self (Array): The Array to be divided.
-            other (float): The scalar divisor.
-
-        Returns:
-            Array: A new Array whose elements are the elements of self divided by other.
-        """
-        self_flat = self.flatten()
-        
-        result_flat = [a / other for a in self_flat]
-        result_data, _ = build_nested_list(result_flat, self.shape)
-        return Array(result_data)
-    
-    def __pow__(self:Array, other:float)-> Array:
-        """Element-wise exponentiation of an Array by a scalar.
-
-        Args:
-            self (Array): The base Array.
-            other (float): The exponent.
-
-        Returns:
-            Array: A new Array whose elements are the elements of self raised to the power of other.
-        """
-        self_flat = self.flatten()
-        
-        result_flat = [a ** other for a in self_flat]
-        result_data, _ = build_nested_list(result_flat,self.shape)
+        # Total complexity: O(mxnxk)~O(n^3)
         return Array(result_data)
     
     def exp(self,cols = None, rows = None)-> Array:
@@ -544,6 +550,7 @@ class Array:
         
         result_flat = [math.exp(a) for a in self_flat]
         result_data, _ = build_nested_list(result_flat,data.shape)
+        # Total complexity: O(sizes)
         return Array(result_data)
     
     def log(self, cols = None, rows = None)-> Array:
@@ -563,6 +570,7 @@ class Array:
         
         result_flat = [math.log(a) for a in self_flat]
         result_data, _ = build_nested_list(result_flat,data.shape)
+        # Total complexity: O(sizes)
         return Array(result_data)
     
     def abs(self, cols = None, rows = None)-> Array:
@@ -582,6 +590,7 @@ class Array:
         
         result_flat = [abs(a) for a in self_flat]
         result_data, _ = build_nested_list(result_flat,data.shape)
+        # Total complexity: O(sizes)
         return Array(result_data)
     
     def sqrt(self, cols = None, rows = None)-> Array:
@@ -600,6 +609,7 @@ class Array:
         self_flat = data.flatten()
         result_flat = [math.sqrt(a) for a in self_flat]
         result_data, _ = build_nested_list(result_flat,data.shape)
+        # Total complexity: O(sizes)
         return Array(result_data)
     
     def sum(self, cols = None, rows = None)-> float:
@@ -618,6 +628,7 @@ class Array:
         sum = 0
         for i in range(len(self_flat)):
             sum += self_flat[i]
+        # Total complexity: O(sizes)
         return float(sum)
     
     def mean(self, cols = None, rows = None)-> float:
@@ -632,7 +643,7 @@ class Array:
             self_flat = self.get_col(cols).flatten()
         elif cols is None and rows is not None:
             self_flat = self.get_row(rows).flatten()
-        
+        # Total complexity: O(sizes)
         return float(sum(self_flat) / len(self_flat))
     
     def max(self, cols = None, rows = None)-> float:
@@ -652,6 +663,7 @@ class Array:
         for i in range(1, len(self_flat)):
             if self_flat[i] > max:
                 max = self_flat[i]
+        # Total complexity: O(sizes)
         return float(max)
     
     def min(self, cols = None, rows = None)-> float:
@@ -671,6 +683,7 @@ class Array:
         for i in range(1, len(self_flat)):
             if self_flat[i] < min:
                 min = self_flat[i]
+        # Total complexity: O(sizes)
         return float(min)
 
     def arg_min(self, cols = None, rows = None)-> tuple:
@@ -690,6 +703,7 @@ class Array:
         a = min(self_flat)
         for i in range(len(self_flat)):
             if self_flat[i] == a:
+                # Total complexity: O(sizes)
                 return index_to_coord(i,data.shape)
             
     def arg_max(self, cols = None, rows = None)-> tuple:
@@ -709,9 +723,9 @@ class Array:
         a = max(self_flat)
         for i in range(len(self_flat)):
             if self_flat[i] == a:
+                # Total complexity: O(sizes)
                 return  index_to_coord(i,data.shape)
-    
-    #TODO: calculate P - permutation matrix
+            
     def LU_Decomposition(self):
         """Perform LU Decomposition of a square Array.
             Idea: PA = LU
@@ -729,6 +743,7 @@ class Array:
         """
         if self._LU is not None:
             return self._LU
+        
         n = self.shape[0]
         
         U = self.copy()
@@ -790,3 +805,43 @@ class Array:
         
         self._det = (-1) **self._swap_count * det
         return (-1) **self._swap_count * det
+    
+    def det_Bareiss(self):
+        if self.ndim != 2:
+            raise ValueError("Matrix should be 2-D")
+        if self.shape[0] != self.shape[1]:
+            raise ValueError("Matrix must be square")
+        
+        n = self.shape[0]
+        A = self.copy()
+        swap_count = 0
+        
+        for p in range(n):
+            
+            if A.data[p][p] == 0:
+                found = False
+                for r in range(p+1, n):
+                    if A.data[r][p] != 0:
+                        A.data[p], A.data[r] = A.data[r], A.data[p]
+                        swap_count ^= 1
+                        found = True
+                        break
+                if not found:
+                    return 0 
+            
+            pivot = 1 if p == 0 else A.data[p-1][p-1]
+            if pivot == 0:
+                return 0
+            
+            for i in range(p+1,n):
+                for j in range(p+1,n):
+                    A.data[i][j] = (A.data[p][p]*A.data[i][j] - A.data[i][p]*A.data[p][j])/pivot
+                A.data[i][p] = 0
+            
+        det = A.data[n-1][n-1]
+        
+        if swap_count == 1:
+            det = -det
+        
+        return det           
+    

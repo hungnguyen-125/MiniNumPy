@@ -1,0 +1,993 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>MiniNumPy.Array.Array &#8212; MiniNumPy 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/_autosummary/MiniNumPy.Array.Array';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">MiniNumPy</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../technical_notes/index.html">
+    <no title>
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../technical_notes/index.html">
+    <no title>
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MiniNumPy.Array.Array</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="mininumpy-array-array">
+<h1>MiniNumPy.Array.Array<a class="headerlink" href="#mininumpy-array-array" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MiniNumPy.Array.</span></span><span class="sig-name descname"><span class="pre">Array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.LU_Decomposition" title="MiniNumPy.Array.Array.LU_Decomposition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LU_Decomposition</span></code></a>()</p></td>
+<td><p>Perform LU Decomposition of a square Array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="array_class/MiniNumPy.Array.Array.html#id0" title="MiniNumPy.Array.Array.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.abs" title="MiniNumPy.Array.Array.abs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abs</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the element-wise absolute value of the Array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.arg_max" title="MiniNumPy.Array.Array.arg_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arg_max</span></code></a>([cols, rows])</p></td>
+<td><p>Find the indices of the maximum value in the Array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.arg_min" title="MiniNumPy.Array.Array.arg_min"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arg_min</span></code></a>([cols, rows])</p></td>
+<td><p>Find the indices of the minimum value in the Array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.copy" title="MiniNumPy.Array.Array.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Return a deep copy the Array</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.determinant" title="MiniNumPy.Array.Array.determinant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determinant</span></code></a>()</p></td>
+<td><p>Compute the determinant of a square Array using its LU Decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.exp" title="MiniNumPy.Array.Array.exp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exp</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the element-wise exponential of the Array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.flatten" title="MiniNumPy.Array.Array.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a>()</p></td>
+<td><p>Flatten an n-dimensional Array into a 1D Python list.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.get_col" title="MiniNumPy.Array.Array.get_col"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_col</span></code></a>(index)</p></td>
+<td><p>Return a column of the 2D Array as a new Array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.get_row" title="MiniNumPy.Array.Array.get_row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_row</span></code></a>(index)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.log" title="MiniNumPy.Array.Array.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the element-wise natural logarithm of the Array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.max" title="MiniNumPy.Array.Array.max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the maximum value among all elements in the Array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.mean" title="MiniNumPy.Array.Array.mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the mean (average) of all elements in the Array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.min" title="MiniNumPy.Array.Array.min"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the minimum value among all elements in the Array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.reshape" title="MiniNumPy.Array.Array.reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reshape</span></code></a>(new_shape)</p></td>
+<td><p>Return a new Array with the same data but a different shape.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.set_col" title="MiniNumPy.Array.Array.set_col"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_col</span></code></a>(index, col)</p></td>
+<td><p>Replace a column of the 2D Array with the values from another Array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.sqrt" title="MiniNumPy.Array.Array.sqrt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqrt</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the element-wise square root of the Array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.sum" title="MiniNumPy.Array.Array.sum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum</span></code></a>([cols, rows])</p></td>
+<td><p>Compute the sum of all elements in the Array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.transpose" title="MiniNumPy.Array.Array.transpose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code></a>([axes])</p></td>
+<td><p>Permute the axes of the Array and return a new transposed Array.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array.T" title="MiniNumPy.Array.Array.T"><code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.get_col">
+<span class="sig-name descname"><span class="pre">get_col</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.get_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.get_col" title="Link to this definition">#</a></dt>
+<dd><p>Return a column of the 2D Array as a new Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the column to extract</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the Array is not 2-dimensional.</p></li>
+<li><p><strong>IndexError</strong> – If the column index is out of bounds</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><code class="xref py py-class docutils literal notranslate"><span class="pre">MiniNumPy.Array.Array</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.set_col">
+<span class="sig-name descname"><span class="pre">set_col</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.set_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.set_col" title="Link to this definition">#</a></dt>
+<dd><p>Replace a column of the 2D Array with the values from another Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The column index to replace.</p></li>
+<li><p><strong>col</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – A column vector (n,1) whose values will overwrite the
+specified column of the current Array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the Array is not 2-dimensional.</p></li>
+<li><p><strong>IndexError</strong> – If the column index is out of bounds</p></li>
+<li><p><strong>ValueError</strong> – If shape of new column is not matched with the Array shape</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.get_row">
+<span class="sig-name descname"><span class="pre">get_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.get_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.get_row" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.flatten">
+<span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.flatten"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.flatten" title="Link to this definition">#</a></dt>
+<dd><p>Flatten an n-dimensional Array into a 1D Python list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List A 1D Python list containing all scalar elements of the array,
+in row-major order.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flattened Array (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.reshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.reshape" title="Link to this definition">#</a></dt>
+<dd><p>Return a new Array with the same data but a different shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_shape</strong> (<em>tuple</em>) – The desired shape of the output array</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the total number of elements implied by <cite>new_shape</cite> does not
+    match the size of the original array.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A new Array instance whose data is the same as the original,</dt><dd><p>but arranged according to <cite>new_shape</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>new Array (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__str__" title="Link to this definition">#</a></dt>
+<dd><p>Return a formatted string representation of the Array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.copy" title="Link to this definition">#</a></dt>
+<dd><p>Return a deep copy the Array</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.T">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T</span></span><a class="headerlink" href="#MiniNumPy.Array.Array.T" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.transpose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.transpose" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Permute the axes of the Array and return a new transposed Array.</dt><dd><dl class="simple">
+<dt>The operation constructs a new Array by:</dt><dd><ol class="arabic simple">
+<li><p>Flattening the original data,</p></li>
+<li><p>Mapping each element’s coordinate under the new axis order,</p></li>
+<li><p>Reshaping the permuted flat list into the new shape.</p></li>
+</ol>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>axes</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Desired ordering of axes. Defaults to None.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the length of axes does not match the Array.ndim</p></li>
+<li><p><strong>ValueError</strong> – If the axes does not contain interger from 0 to Array.ndim -1</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Array with its axes permuted according to <cite>axes</cite>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__add__" title="Link to this definition">#</a></dt>
+<dd><p>Element-wise addition of two Arrays</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – First Array</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – Second Array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the two Arrays do not have the same size.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Array whose elements are the sum of the corresponding elements of self and other.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__mul__">
+<span class="sig-name descname"><span class="pre">__mul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__mul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__mul__" title="Link to this definition">#</a></dt>
+<dd><p>Element-wise multiplication of an Array by a scalar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – The Array to be scaled.</p></li>
+<li><p><strong>other</strong> (<em>float</em>) – The scalar multiplier.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Array whose elements are the elements of self multiplied by other.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__sub__">
+<span class="sig-name descname"><span class="pre">__sub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__sub__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__sub__" title="Link to this definition">#</a></dt>
+<dd><p>Element-wise subtraction of two Arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – The minuend Array.</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – The subtrahend Array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Array whose elements are the difference between the corresponding elements of self and other.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__matmul__">
+<span class="sig-name descname"><span class="pre">__matmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__matmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__matmul__" title="Link to this definition">#</a></dt>
+<dd><p>Matrix multiplication of two Arrays. 2D Arrays or 1D Arrays are supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – First Array</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – Second Array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the inner dimensions do not match for matrix multiplication.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Array resulting from the matrix multiplication of self and other.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__truediv__">
+<span class="sig-name descname"><span class="pre">__truediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__truediv__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__truediv__" title="Link to this definition">#</a></dt>
+<dd><p>Element-wise division of an Array by a scalar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – The Array to be divided.</p></li>
+<li><p><strong>other</strong> (<em>float</em>) – The scalar divisor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Array whose elements are the elements of self divided by other.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.__pow__">
+<span class="sig-name descname"><span class="pre">__pow__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.__pow__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.__pow__" title="Link to this definition">#</a></dt>
+<dd><p>Element-wise exponentiation of an Array by a scalar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array"><em>Array</em></a>) – The base Array.</p></li>
+<li><p><strong>other</strong> (<em>float</em>) – The exponent.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Array whose elements are the elements of self raised to the power of other.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.exp">
+<span class="sig-name descname"><span class="pre">exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.exp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.exp" title="Link to this definition">#</a></dt>
+<dd><p>Compute the element-wise exponential of the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Array whose elements are the exponential of the corresponding elements of self.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.log" title="Link to this definition">#</a></dt>
+<dd><p>Compute the element-wise natural logarithm of the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Array whose elements are the natural logarithm of the corresponding elements of self.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.abs">
+<span class="sig-name descname"><span class="pre">abs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.abs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.abs" title="Link to this definition">#</a></dt>
+<dd><p>Compute the element-wise absolute value of the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Array whose elements are the absolute values of the corresponding elements of self.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.sqrt">
+<span class="sig-name descname"><span class="pre">sqrt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.sqrt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.sqrt" title="Link to this definition">#</a></dt>
+<dd><p>Compute the element-wise square root of the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Array whose elements are the square roots of the corresponding elements of self.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.sum">
+<span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.sum" title="Link to this definition">#</a></dt>
+<dd><p>Compute the sum of all elements in the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The sum of all elements.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.mean">
+<span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.mean" title="Link to this definition">#</a></dt>
+<dd><p>Compute the mean (average) of all elements in the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The mean of all elements.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.max">
+<span class="sig-name descname"><span class="pre">max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.max" title="Link to this definition">#</a></dt>
+<dd><p>Compute the maximum value among all elements in the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The maximum value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.min">
+<span class="sig-name descname"><span class="pre">min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.min"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.min" title="Link to this definition">#</a></dt>
+<dd><p>Compute the minimum value among all elements in the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The minimum value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.arg_min">
+<span class="sig-name descname"><span class="pre">arg_min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.arg_min"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.arg_min" title="Link to this definition">#</a></dt>
+<dd><p>Find the indices of the minimum value in the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The indices of the minimum value as a tuple.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.arg_max">
+<span class="sig-name descname"><span class="pre">arg_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.arg_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.arg_max" title="Link to this definition">#</a></dt>
+<dd><p>Find the indices of the maximum value in the Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The indices of the maximum value as a tuple.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.LU_Decomposition">
+<span class="sig-name descname"><span class="pre">LU_Decomposition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.LU_Decomposition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.LU_Decomposition" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Perform LU Decomposition of a square Array.</dt><dd><p>Idea: PA = LU
+where P is permutation matrix
+L is lower triangular matrix with unit diagonal elements
+and U is upper triangular matrix.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the Array is not square.</p></li>
+<li><p><strong>ValueError</strong> – If a zero pivot is encountered (no pivoting implemented).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lower triangular matrix with unit diagonal elements.
+U (Array): Upper triangular matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>L (<a class="reference internal" href="../array.html#MiniNumPy.Array.Array" title="MiniNumPy.Array.Array">Array</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MiniNumPy.Array.Array.determinant">
+<span class="sig-name descname"><span class="pre">determinant</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MiniNumPy/Array.html#Array.determinant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MiniNumPy.Array.Array.determinant" title="Link to this definition">#</a></dt>
+<dd><p>Compute the determinant of a square Array using its LU Decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The determinant of the Array.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array"><code class="docutils literal notranslate"><span class="pre">Array</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__init__"><code class="docutils literal notranslate"><span class="pre">Array.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">Array.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.get_col"><code class="docutils literal notranslate"><span class="pre">Array.get_col()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.set_col"><code class="docutils literal notranslate"><span class="pre">Array.set_col()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.get_row"><code class="docutils literal notranslate"><span class="pre">Array.get_row()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.flatten"><code class="docutils literal notranslate"><span class="pre">Array.flatten()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.reshape"><code class="docutils literal notranslate"><span class="pre">Array.reshape()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__str__"><code class="docutils literal notranslate"><span class="pre">Array.__str__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.copy"><code class="docutils literal notranslate"><span class="pre">Array.copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.T"><code class="docutils literal notranslate"><span class="pre">Array.T</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.transpose"><code class="docutils literal notranslate"><span class="pre">Array.transpose()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__add__"><code class="docutils literal notranslate"><span class="pre">Array.__add__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__mul__"><code class="docutils literal notranslate"><span class="pre">Array.__mul__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__sub__"><code class="docutils literal notranslate"><span class="pre">Array.__sub__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__matmul__"><code class="docutils literal notranslate"><span class="pre">Array.__matmul__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__truediv__"><code class="docutils literal notranslate"><span class="pre">Array.__truediv__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.__pow__"><code class="docutils literal notranslate"><span class="pre">Array.__pow__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.exp"><code class="docutils literal notranslate"><span class="pre">Array.exp()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.log"><code class="docutils literal notranslate"><span class="pre">Array.log()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.abs"><code class="docutils literal notranslate"><span class="pre">Array.abs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.sqrt"><code class="docutils literal notranslate"><span class="pre">Array.sqrt()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.sum"><code class="docutils literal notranslate"><span class="pre">Array.sum()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.mean"><code class="docutils literal notranslate"><span class="pre">Array.mean()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.max"><code class="docutils literal notranslate"><span class="pre">Array.max()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.min"><code class="docutils literal notranslate"><span class="pre">Array.min()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.arg_min"><code class="docutils literal notranslate"><span class="pre">Array.arg_min()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.arg_max"><code class="docutils literal notranslate"><span class="pre">Array.arg_max()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.LU_Decomposition"><code class="docutils literal notranslate"><span class="pre">Array.LU_Decomposition()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#MiniNumPy.Array.Array.determinant"><code class="docutils literal notranslate"><span class="pre">Array.determinant()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Duc Hung NGUYEN.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
