@@ -7,12 +7,11 @@ def build_nested_list(flat_data:list, shape:tuple, offset=0):
     Args:
         flat_data (list): A flat list containing the data elements.
         shape (tuple): The desired shape of the nested list.
-        offset (int, optional): Work as a pointer point to the data will take in next loop (tracking pointer). This is used
-        internally during recursion. Defaults to 0.
+        offset (int, optional): Work as a pointer point to the data will take in next loop (tracking pointer). This is used internally during recursion. Defaults to 0.
 
     Returns:
-        nested_list: A nested list structured according to the specified shape.
-        offset: The updated offset after building the nested list.
+        nested_list (list): A nested list structured according to the specified shape.
+        offset (int): The updated offset after building the nested list.
     """
 
     # If shape empty => return a single element
@@ -205,8 +204,6 @@ class Array:
         self._det = None
         
         self._swap_count = 0
-
-       
 
 
     def _get_shape(self, data)-> tuple:
@@ -781,7 +778,7 @@ class Array:
                     
         self._swap_count = swap_count
         self._LU = (P, L, U)
-        return P, L, U   
+        return P, L, U
     
     def determinant(self)-> float:
         """Compute the determinant of a square Array using its LU Decomposition.
@@ -844,4 +841,4 @@ class Array:
             det = -det
         
         return det           
-    
+        

@@ -13,15 +13,17 @@ def dot(a: Array, b: Array):
         Array : if either input is a multi-dimensional array, returns the matrix product.
     """
     dot = 0
-    if a.ndim == 1 and b.ndim ==1:
+    if a.ndim == 1 and b.ndim ==1 and a.shape[0] == b.shape[0]:
         for i in range(a.size):
             dot += a.data[i]*b.data[i]
         return dot 
     
-    if a.shape[1] == 1 and b.shape[1] == 1:
+    #TODO: check
+    if a.ndim ==2 and b.ndim ==2 and a.shape[1] == 1 and b.shape[1] == 1  :
         for i in range(a.size):
             dot += a.data[i][0]*b.data[i][0]
         return dot 
+    
     else:
         return a@b
 
@@ -39,6 +41,9 @@ def matmul(A: Array, B: Array)-> Array:
     Returns:
         Array: The result of the matrix multiplication with broadcasting applied.
     """
+    if A.ndim < 2 or B.ndim < 2:
+        raise ValueError("matmul: inputs must be at least 2-D arrays")
+    
     # Compatible checking
     if A.shape[-1] != B.shape[-2]:
         raise ValueError("matmul: last dims mismatch")
@@ -406,13 +411,11 @@ def eig(B:Array, max_iter=200, eps=1e-6):
 
     # eigenvalues = diagonal
     eigenvalues = [A.data[i][i] for i in range(n)]
-    
-    eigenvectors = []
 
-    # for lam in eigenvalues:
-    #     M = B - identity(n)*lam
-    #     v = nullspace(M)
-    #     eigenvectors.append(v.data)
-    
-    return Array(eigenvalues), Array(eigenvectors)
+    # for j in range(n):
+    #     Vcol= V.get_col(j)
+    #     Vcol /= Vcol.data[n-1][0]
+    #     V.set_col(j,Vcol)
+        
+    return Array(eigenvalues), V
 
